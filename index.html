@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sindy Maya (Kiki 🐨) - Learning w' Kil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #334155; overflow: hidden; }
+        
+        .chart-container {
+            position: relative; width: 100%; max-width: 550px;
+            margin-left: auto; margin-right: auto; height: 300px; max-height: 400px;
+        }
+        @media (min-width: 768px) { .chart-container { height: 350px; } }
+
+        .view-section { display: none; height: 100%; overflow-y: auto; animation: fadeIn 0.3s ease-in-out; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .modal-overlay { display: none; animation: fadeIn 0.2s ease-out; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .nav-btn { transition: all 0.2s ease; border-left: 4px solid transparent; }
+        .nav-btn:hover { background-color: rgba(16, 185, 129, 0.15); }
+        .nav-btn.active { background-color: #10b981; color: white; border-left-color: #059669; font-weight: 700; }
+        
+        .tab-btn { border-bottom: 3px solid transparent; transition: all 0.2s; }
+        .tab-btn.active { border-bottom-color: #10b981; color: #1e3a8a; font-weight: 800; }
+        
+        .week-card { transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; border-top: 4px solid #3b82f6; }
+        .week-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px -3px rgba(59, 130, 246, 0.2); }
+
+        .glossary-tab { transition: all 0.2s; }
+        .glossary-tab.active { background-color: #1e40af; color: white; transform: translateY(-2px); box-shadow: 0 6px 10px -2px rgba(30, 64, 175, 0.3); }
+        
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+    </style>
+</head>
+<body class="antialiased h-screen flex flex-col md:flex-row">
+
+    <!-- Chosen Palette: Blue & Emerald Green. Typography size has been increased globally for better readability. Added massive 200+ word glossary. -->
+
+    <nav class="w-full md:w-72 bg-blue-900 flex-shrink-0 flex flex-col shadow-xl z-20 text-white h-auto md:h-full">
+        <div class="p-6 border-b border-blue-800 bg-blue-950 flex flex-col items-center md:items-start text-center md:text-left">
+            <div class="text-5xl mb-3">🐨</div>
+            <h1 class="text-2xl font-extrabold tracking-tight text-emerald-400">Sindy Maya</h1>
+            <p class="text-sm uppercase font-extrabold tracking-widest text-blue-200 mt-1">Kiki 🐨</p>
+        </div>
+        <div class="flex-1 overflow-y-auto py-4 flex flex-row md:flex-col overflow-x-auto md:overflow-hidden gap-2 px-4">
+            <button onclick="navigate('inicio')" id="nav-inicio" class="nav-btn active flex-1 text-left px-5 py-4 rounded-xl text-base font-semibold text-blue-50 whitespace-nowrap md:whitespace-normal flex items-center gap-3">
+                <span class="text-xl">🏠</span> Inicio
+            </button>
+            <button onclick="navigate('rutina')" id="nav-rutina" class="nav-btn flex-1 text-left px-5 py-4 rounded-xl text-base font-semibold text-blue-50 whitespace-nowrap md:whitespace-normal flex items-center gap-3">
+                <span class="text-xl">📅</span> Temario
+            </button>
+            <button onclick="navigate('recursos')" id="nav-recursos" class="nav-btn flex-1 text-left px-5 py-4 rounded-xl text-base font-semibold text-blue-50 whitespace-nowrap md:whitespace-normal flex items-center gap-3">
+                <span class="text-xl">📚</span> Glosario
+            </button>
+            <button onclick="navigate('autoestudio')" id="nav-autoestudio" class="nav-btn flex-1 text-left px-5 py-4 rounded-xl text-base font-semibold text-blue-50 whitespace-nowrap md:whitespace-normal flex items-center gap-3">
+                <span class="text-xl">💡</span> Tips
+            </button>
+        </div>
+        <div class="p-4 bg-blue-950 text-xs text-blue-300 text-center uppercase tracking-wider font-bold hidden md:block">
+            Programa Intensivo A2+
+        </div>
+    </nav>
+
+    <main class="flex-1 bg-slate-50 relative h-[calc(100vh-160px)] md:h-screen">
+        
+        <!-- INICIO -->
+        <section id="inicio" class="view-section active">
+            <div class="bg-gradient-to-r from-blue-700 to-blue-500 text-white px-8 py-12 shadow-md relative overflow-hidden">
+                <div class="absolute top-0 right-0 opacity-10 text-9xl transform rotate-12 translate-x-10 -translate-y-4">🐨</div>
+                <div class="max-w-5xl mx-auto relative z-10">
+                    <h2 class="text-4xl font-extrabold mb-4">¡Hola Kiki! ¡Bienvenida! 🎉</h2>
+                    <p class="text-lg md:text-xl text-blue-50 leading-relaxed max-w-3xl font-medium">
+                        Qué felicidad tan inmensa tenerte aquí. Me hace muchísima ilusión ser tu apoyo en este hermoso proceso de aprendizaje. He preparado este programa de <strong>Learning w' Kil</strong> especialmente para ti, para que domines el inglés de una vez por todas, en tu vida diaria y en tu servicio a Jehová. ¡Vamos a lograr cosas increíbles juntas! 💚
+                    </p>
+                </div>
+            </div>
+
+            <div class="max-w-6xl mx-auto p-6 md:p-10">
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                    <div class="xl:col-span-2 space-y-8">
+                        <div>
+                            <h3 class="text-2xl font-extrabold text-blue-900 mb-6 border-b-4 border-emerald-400 pb-2 inline-block">Índice del Programa</h3>
+                            <p class="text-base text-slate-600 mb-6 font-medium">Este es tu mapa de ruta para los próximos 3 meses. Dirígete a la pestaña "Temario" en el menú para ver el detalle de cada semana y cada clase.</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                                    <h4 class="text-lg font-extrabold text-blue-800 mb-3 border-b-2 border-slate-100 pb-2 flex items-center gap-2"><span>1️⃣</span> Mes 1: Bases</h4>
+                                    <ul class="text-sm text-slate-700 space-y-2 list-disc pl-5 font-medium">
+                                        <li>To Be y Presentaciones</li>
+                                        <li>Fonética de las Vocales</li>
+                                        <li>Rutinas (Presente Simple)</li>
+                                        <li>La regla de Tercera Persona</li>
+                                        <li>Acciones en el momento</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                                    <h4 class="text-lg font-extrabold text-blue-800 mb-3 border-b-2 border-slate-100 pb-2 flex items-center gap-2"><span>2️⃣</span> Mes 2: Pasado</h4>
+                                    <ul class="text-sm text-slate-700 space-y-2 list-disc pl-5 font-medium">
+                                        <li>Gustos e Invitaciones</li>
+                                        <li>Pasado Regular (-ed)</li>
+                                        <li>Fonética del Pasado</li>
+                                        <li>Verbos Irregulares clave</li>
+                                        <li>Direcciones en la ciudad</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                                    <h4 class="text-lg font-extrabold text-blue-800 mb-3 border-b-2 border-slate-100 pb-2 flex items-center gap-2"><span>3️⃣</span> Mes 3: Futuro</h4>
+                                    <ul class="text-sm text-slate-700 space-y-2 list-disc pl-5 font-medium">
+                                        <li>Dar Consejos Bíblicos</li>
+                                        <li>Planes vs Promesas</li>
+                                        <li>Contracciones naturales</li>
+                                        <li>Comparativos</li>
+                                        <li>Fluidez y Presentaciones</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="xl:col-span-1">
+                        <div class="bg-white p-8 rounded-2xl shadow-md border border-slate-200 h-full flex flex-col">
+                            <h3 class="text-xl font-extrabold text-blue-900 mb-3 text-center">Tu Crecimiento Proyectado</h3>
+                            <p class="text-sm text-slate-600 text-center mb-6 font-medium">Evolución estimada de tus habilidades a lo largo de las 12 semanas de estudio intenso.</p>
+                            <div class="flex-1 w-full flex items-center justify-center">
+                                <div class="chart-container">
+                                    <canvas id="progressRadarChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TEMARIO -->
+        <section id="rutina" class="view-section">
+            <div class="max-w-6xl mx-auto p-6 md:p-10">
+                <header class="mb-8 border-b-2 border-slate-200 pb-6">
+                    <h2 class="text-3xl font-extrabold text-blue-900">Temario Interactivo</h2>
+                    <p class="mt-3 text-lg text-slate-600 font-medium">
+                        Selecciona el mes y <strong>haz clic en cualquier semana</strong> para abrir tu guía de estudio detallada.
+                    </p>
+                </header>
+
+                <div class="flex space-x-4 border-b-2 border-slate-200 mb-8 overflow-x-auto pb-1">
+                    <button onclick="filterMonths(1)" id="tab-month-1" class="tab-btn active px-6 py-3 text-slate-500 hover:text-blue-800 whitespace-nowrap text-lg rounded-t-xl hover:bg-slate-100 font-bold">Mes 1: Bases</button>
+                    <button onclick="filterMonths(2)" id="tab-month-2" class="tab-btn px-6 py-3 text-slate-500 hover:text-blue-800 whitespace-nowrap text-lg rounded-t-xl hover:bg-slate-100 font-bold">Mes 2: Narrativa</button>
+                    <button onclick="filterMonths(3)" id="tab-month-3" class="tab-btn px-6 py-3 text-slate-500 hover:text-blue-800 whitespace-nowrap text-lg rounded-t-xl hover:bg-slate-100 font-bold">Mes 3: Futuro</button>
+                </div>
+
+                <div id="weeks-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-12">
+                    <!-- Javascript populates this -->
+                </div>
+            </div>
+        </section>
+
+        <!-- GLOSARIO (CON 200 PALABRAS) -->
+        <section id="recursos" class="view-section bg-slate-100 flex-col h-full">
+            <div class="bg-blue-900 text-white px-6 md:px-10 py-8 shadow-md flex-shrink-0">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="text-3xl font-extrabold mb-2 flex items-center gap-3">📖 El Gran Glosario de Kiki</h2>
+                    <p class="text-blue-200 text-base mb-6 font-medium">Tienes más de 50 palabras nuevas por cada categoría para estudiar. ¡Usa el buscador!</p>
+                    
+                    <div class="flex flex-wrap gap-3">
+                        <button onclick="openGlossaryTab('Todos')" id="g-tab-Todos" class="glossary-tab active px-5 py-2.5 rounded-xl bg-blue-800 text-white font-bold border border-blue-700 text-sm shadow-md">
+                            🔍 Todos
+                        </button>
+                        <button onclick="openGlossaryTab('Hábitos')" id="g-tab-Hábitos" class="glossary-tab px-5 py-2.5 rounded-xl bg-white text-blue-900 font-bold border border-slate-200 text-sm shadow-md">
+                            ☕ Vida Diaria
+                        </button>
+                        <button onclick="openGlossaryTab('Teocrático')" id="g-tab-Teocrático" class="glossary-tab px-5 py-2.5 rounded-xl bg-white text-emerald-700 font-bold border border-slate-200 text-sm shadow-md">
+                            🕊️ Teocrático (JW)
+                        </button>
+                        <button onclick="openGlossaryTab('Verbos')" id="g-tab-Verbos" class="glossary-tab px-5 py-2.5 rounded-xl bg-white text-blue-900 font-bold border border-slate-200 text-sm shadow-md">
+                            🏃‍♀️ Verbos
+                        </button>
+                        <button onclick="openGlossaryTab('Lugares')" id="g-tab-Lugares" class="glossary-tab px-5 py-2.5 rounded-xl bg-white text-blue-900 font-bold border border-slate-200 text-sm shadow-md">
+                            🏙️ Lugares
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-6 md:p-10">
+                <div class="max-w-6xl mx-auto">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 bg-white p-5 rounded-2xl shadow-sm border border-slate-200 gap-4">
+                        <h3 id="glossary-dynamic-title" class="text-xl font-extrabold text-blue-800">Explorando: Todos</h3>
+                        <div class="w-full md:w-80 relative">
+                            <span class="absolute left-4 top-3.5 text-lg text-slate-400">🔍</span>
+                            <input type="text" id="search-vocab" placeholder="Buscar palabra en inglés o español..." class="w-full pl-12 pr-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 bg-slate-50 text-base font-medium" onkeyup="handleSearch()">
+                        </div>
+                    </div>
+
+                    <div id="vocab-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <!-- Populated via JS -->
+                    </div>
+                    
+                    <div id="no-results" class="hidden text-center py-16 text-slate-500 bg-white rounded-2xl border border-slate-200 shadow-sm mt-6">
+                        <span class="text-6xl block mb-4">🧐</span>
+                        <p class="text-xl font-extrabold text-blue-900">Sin resultados, Kiki.</p>
+                        <p class="text-base mt-2 font-medium">Anótala en tu cuaderno para investigarla juntas.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TIPS -->
+        <section id="autoestudio" class="view-section">
+            <div class="max-w-5xl mx-auto p-6 md:p-10">
+                <header class="mb-10 border-b-2 border-slate-200 pb-6">
+                    <h2 class="text-3xl font-extrabold text-blue-900 flex items-center gap-3">💡 Tips Autodidactas</h2>
+                    <p class="mt-3 text-lg text-slate-600 font-medium">Sindy, la clave de la fluidez es lo que haces cuando no estamos en clase. Usa estas herramientas:</p>
+                </header>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                    <div class="bg-white p-8 rounded-2xl shadow-md border-t-8 border-t-emerald-500">
+                        <h3 class="text-xl font-extrabold text-blue-900 mb-4 flex items-center gap-3">
+                            <span class="bg-emerald-100 p-2 rounded-full text-xl">📱</span> Método JW Library
+                        </h3>
+                        <ul class="space-y-4 text-sm text-slate-700 bg-slate-50 p-6 rounded-xl border border-slate-100 font-medium leading-relaxed">
+                            <li><strong class="text-emerald-700 text-base">Lectura paralela:</strong> Abre La Atalaya, cambia el idioma de español a inglés y compara cómo se arman las oraciones completas.</li>
+                            <li><strong class="text-emerald-700 text-base">Shadowing (Eco):</strong> Reproduce el audio de un artículo, escucha a la persona y lee en voz alta exactamente al mismo tiempo imitando su acento.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-2xl shadow-md border-t-8 border-t-blue-500">
+                        <h3 class="text-xl font-extrabold text-blue-900 mb-4 flex items-center gap-3">
+                            <span class="bg-blue-100 p-2 rounded-full text-xl">🗣️</span> Pronunciación Real
+                        </h3>
+                        <ol class="space-y-4 text-sm text-slate-700 bg-slate-50 p-6 rounded-xl border border-slate-100 font-medium leading-relaxed list-decimal pl-6">
+                            <li>Entra a la página web <strong>YouGlish.com</strong></li>
+                            <li>Escribe cualquier palabra (ejemplo: "righteousness").</li>
+                            <li>La página te mostrará videos reales de YouTube donde personas nativas pronuncian esa palabra en oraciones reales. Escucha y repite.</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 border-2 border-blue-200 p-8 rounded-2xl shadow-sm text-center">
+                    <h3 class="text-2xl font-extrabold text-blue-900 mb-3">Tu Meta Diaria: 15 Minutos ⏱️</h3>
+                    <p class="text-base text-slate-700 font-medium max-w-2xl mx-auto">No intentes estudiar 3 horas seguidas el domingo. Te agotarás. Es mucho mejor dedicarle solo 15 minutos todos los días leyendo el texto diario en inglés o repasando tu glosario.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL (TEMARIO DETALLADO) -->
+    <div id="week-modal" class="modal-overlay fixed inset-0 bg-slate-900 bg-opacity-75 z-50 justify-center items-center p-4 md:p-8 backdrop-blur-sm">
+        <div class="modal-content bg-white rounded-3xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden border-2 border-slate-200">
+            
+            <div class="bg-blue-700 p-6 md:p-8 flex justify-between items-start flex-shrink-0 relative overflow-hidden">
+                <div class="absolute top-0 right-0 opacity-10 text-8xl transform translate-x-4 -translate-y-4">🐨</div>
+                <div class="relative z-10">
+                    <span id="modal-subtitle" class="bg-blue-900 text-blue-100 text-xs font-extrabold uppercase tracking-widest px-3 py-1 rounded-lg mb-2 inline-block shadow-sm">Mes X • Semana Y</span>
+                    <h3 id="modal-title" class="text-2xl md:text-3xl font-extrabold text-white mt-1">Título de la Semana</h3>
+                </div>
+                <button onclick="closeModal()" class="relative z-10 text-white hover:text-blue-900 hover:bg-white bg-blue-600 rounded-full w-10 h-10 flex justify-center items-center text-xl font-bold transition shadow-md">&times;</button>
+            </div>
+            
+            <div id="modal-body" class="p-6 md:p-10 overflow-y-auto flex-1 bg-slate-50">
+                <!-- Se inyecta por JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const weeklyData = [
+            { week: 1, month: 1, title: "Identidad y Entorno", summary: "Las bases de todo: Presentarte, deletrear y hablar del entorno de la congregación sin miedo.", grammar: ["Verbo 'To Be' (Am/Is/Are). Afirmación, negación y preguntas.", "Pronombres y Posesivos (my, your, his, her).", "Artículos (A/An/The) y Demostrativos (This/That)."], phonetics: "El Alfabeto. Contraste: /ɪ/ vs /iː/ (live/leave, ship/sheep).", vocabGen: "Saludos, Números, Países, Profesiones.", vocabTeo: "Brother, Sister, Congregation, Kingdom Hall, Meeting.", selfStudy: "Abre JW.org en inglés. Ve a 'Meetings'. Escucha la canción 1 leyendo la letra para ver la pronunciación de los saludos.", classes: [{ num: 1, focus: "Greetings & To Be. Presentaciones alegres y dinámicas." }, { num: 2, focus: "Posesivos, Demostrativos y Deletreo (Alfabeto)." }, { num: 3, focus: "Role-play: Recibiendo a un visitante en el Salón del Reino." }] },
+            { week: 2, month: 1, title: "Rutinas Personales", summary: "Aprenderemos a describir el día a día y tu horario de predicación.", grammar: ["Presente Simple (I, You, We, They). Auxiliar Do/Don't.", "Adverbios de Frecuencia (Always, Usually, Never).", "Preposiciones de Tiempo básicas (In, On, At)."], phonetics: "Ritmo de la oración (Sentence Rhythm). Evitar hablar plano.", vocabGen: "Rutinas, Días, Decir la hora.", vocabTeo: "Preaching work, Field service, Personal study, Ministry.", selfStudy: "Escribe tu rutina espiritual semanal completa en inglés en tu cuaderno.", classes: [{ num: 1, focus: "Verbos de rutina y decir la hora. Armar la agenda." }, { num: 2, focus: "Adverbios de frecuencia. Preguntas: 'How often do you...?'" }, { num: 3, focus: "Speaking: Describir tu rutina secular y ministerial diaria." }] },
+            { week: 3, month: 1, title: "Tercera Persona", summary: "Hablar sobre otros (Él, Ella). Dominaremos la regla de la 'S'.", grammar: ["Presente Simple para He/She/It. Auxiliares Does / Doesn't.", "Reglas ortográficas: -s, -es, -ies.", "Question words (Who, What, Where, When)."], phonetics: "Terminación de la 3ra persona: /s/ (works), /z/ (plays), /ɪz/ (watches).", vocabGen: "Familia extendida, Descripción física básica.", vocabTeo: "Elder, Pioneer, Circuit Overseer, Ministerial Servant.", selfStudy: "Lee la biografía de alguien en La Atalaya. Subraya los verbos con 'S' al final.", classes: [{ num: 1, focus: "Reglas de afirmación (He/She). Describir a otra persona." }, { num: 2, focus: "Drill fonético intensivo (/s/ /z/ /ɪz/) con Does/Doesn't." }, { num: 3, focus: "Role-play: Entrevista describiendo la semana de un Anciano." }] },
+            { week: 4, month: 1, title: "Acciones en Curso", summary: "Describiremos lo que está sucediendo en este preciso momento.", grammar: ["Presente Continuo (To Be + Verbo-ing).", "Contraste: Simple (Rutina) vs Continuo (Ahora).", "Verbos de estado (know, like, want)."], phonetics: "El sonido Nasal /ŋ/ (doing, walking). No pronunciar la 'G' fuerte final.", vocabGen: "Ropa, Clima, Actividades domésticas.", vocabTeo: "Cart witnessing, giving a comment, singing, reading.", selfStudy: "Mira fotos en JW.org. Escribe 3 oraciones diciendo qué están haciendo AHORA.", classes: [{ num: 1, focus: "Estructura del Continuo. Juego de mímica." }, { num: 2, focus: "Contraste Simple vs Continuo. (Usually vs Today)." }, { num: 3, focus: "Descripción de ilustraciones del paraíso o predicación." }] },
+            { week: 5, month: 2, title: "Gustos e Invitaciones", summary: "Expresar qué amamos hacer y aprender a invitar a otros cortésmente.", grammar: ["Verbos de preferencia + Gerundio (-ing) o Infinitivo.", "Preguntas formales: 'Would you like...?'", "Contables e Incontables (Some/Any)."], phonetics: "Contraste de labios: /v/ vs /b/ (very/berry).", vocabGen: "Hobbies, Comida, Géneros de películas.", vocabTeo: "Singing kingdom songs, broadcasting, hospitality.", selfStudy: "Investiga cómo invitar a la Conmemoración en el folleto en JW Library.", classes: [{ num: 1, focus: "Like/Love + ing. Entrevista de pasatiempos." }, { num: 2, focus: "Fonética /v/ vs /b/. Invitar comida (Would you like some...?)." }, { num: 3, focus: "Role-play: Invitando a un compañero al Salón." }] },
+            { week: 6, month: 2, title: "Narrativa: El Pasado", summary: "Comenzamos a contar historias. Hablaremos de eventos terminados.", grammar: ["Pasado del 'To Be' (Was/Were).", "Pasado Simple Regulares (-ed).", "Expresiones de tiempo (yesterday, last year)."], phonetics: "Las 3 terminaciones -ed: /t/ (worked), /d/ (played), /ɪd/ (visited).", vocabGen: "Adjetivos de ánimo, Fechas exactas.", vocabTeo: "Convention, Assembly, Memorial, Baptism.", selfStudy: "Busca en YouGlish 5 verbos regulares para escuchar su pronunciación.", classes: [{ num: 1, focus: "Was / Were. Describir dónde estabas en el pasado." }, { num: 2, focus: "Reglas del -ed. Entrenamiento auditivo intensivo." }, { num: 3, focus: "Storytelling: '¿Cómo estuvo la última asamblea?'" }] },
+            { week: 7, month: 2, title: "Pasado (Irregulares)", summary: "Narrar historias complejas sin pausas, usando verbos irregulares clave.", grammar: ["Top 40 Verbos Irregulares del Pasado Simple.", "Auxiliar Did / Didn't para preguntas.", "Conectores (First, then, finally)."], phonetics: "El sonido Schwa /ə/ (sílabas relajadas: a-bout).", vocabGen: "Viajes, Experiencias de vida.", vocabTeo: "Learning the truth, praying, preaching door-to-door.", selfStudy: "Prepara tu 'Experiencia' en tu cuaderno usando conectores.", classes: [{ num: 1, focus: "Memorización de los top 20 verbos irregulares." }, { num: 2, focus: "Preguntas con Did. Juego estilo periodista." }, { num: 3, focus: "Fluidez: Contar tu experiencia o cómo conociste la verdad." }] },
+            { week: 8, month: 2, title: "Lugares y Direcciones", summary: "Dar instrucciones claras, ubicar lugares y describir espacios.", grammar: ["Preposiciones de Lugar.", "Imperativos (Go straight).", "There is / There are."], phonetics: "Sonidos con la lengua en los dientes: /θ/ vs /ð/.", vocabGen: "Lugares de ciudad, Muebles, Direcciones.", vocabTeo: "Territory, Return visit, Map, Podium.", selfStudy: "Dibuja un mapa y escribe cómo llegar al Salón en inglés.", classes: [{ num: 1, focus: "There is/are. Describir habitaciones y el Salón." }, { num: 2, focus: "Dar direcciones. Ejercicios con espejo para /θ/ y /ð/." }, { num: 3, focus: "Role-play: Guiando a un hermano en la calle." }] },
+            { week: 9, month: 3, title: "Obligaciones y Consejos", summary: "Aprender a expresar deberes y dar sugerencias bíblicas con tacto.", grammar: ["Modales de Obligación: Must vs Have to.", "Modales de Consejo: Should / Shouldn't.", "Infinitivos de propósito."], phonetics: "Formas débiles (Weak forms): shoul-da, hav-ta.", vocabGen: "Reglas, Salud, Tareas del hogar.", vocabTeo: "Bible principles, Moral standards, Encouragement.", selfStudy: "Busca un artículo para familias en JW.org. Identifica el uso de 'Should'.", classes: [{ num: 1, focus: "Must vs Have to. (Reglas internas vs externas)." }, { num: 2, focus: "Should/Shouldn't. Práctica de formas débiles." }, { num: 3, focus: "Role-play: Dando consejo bíblico (Should)." }] },
+            { week: 10, month: 3, title: "Planes y Proyectos", summary: "Hablaremos de intenciones, agendas y metas espirituales a futuro.", grammar: ["Futuro con 'Be going to'.", "Presente Continuo con valor de futuro."], phonetics: "Reducción informal: 'Going to' se vuelve 'Gonna'.", vocabGen: "Expresiones futuras, Viajes, Agendas.", vocabTeo: "Spiritual goals, Bethel, Pioneer school.", selfStudy: "Escribe tus metas espirituales a corto plazo usando 'Going to'.", classes: [{ num: 1, focus: "Going to vs Continuo. (Planes vs Agenda)." }, { num: 2, focus: "Fonética: Práctica de 'Gonna' para fluidez." }, { num: 3, focus: "Presentación: 'Mis metas espirituales'." }] },
+            { week: 11, month: 3, title: "Promesas y Condiciones", summary: "Describir el Paraíso, decisiones espontáneas y promesas.", grammar: ["Futuro con 'Will / Won't'.", "Will vs Going to.", "Primer Condicional (If + Presente, Will)."], phonetics: "Contracciones con Will (I'll, you'll). La 'L' oscura.", vocabGen: "Medio ambiente, Promesas cotidianas.", vocabTeo: "Paradise, Kingdom blessings, Resurrection hope.", selfStudy: "Lee las promesas de 'Enjoy Life Forever' e identifica 'Will'.", classes: [{ num: 1, focus: "Will vs Going to. Decisiones rápidas." }, { num: 2, focus: "Contracciones (I'll) + Primer Condicional." }, { num: 3, focus: "Ministerio: Leer Rev 21:4 y explicar promesas con Will." }] },
+            { week: 12, month: 3, title: "Comparaciones y Fluidez", summary: "Dar opiniones estructuradas, comparar cosas y la evaluación final.", grammar: ["Comparativos (-er) y Superlativos (-est).", "Revisión de todos los tiempos.", "Frases de opinión."], phonetics: "Acento de palabra en adjetivos largos.", vocabGen: "Adjetivos de personalidad.", vocabTeo: "Faithful, Loyal, Loving, Endurance.", selfStudy: "Grábate respondiendo: 'Why is learning English important?'", classes: [{ num: 1, focus: "Comparativos/Superlativos." }, { num: 2, focus: "Silla Caliente: Responder mezclando tiempos." }, { num: 3, focus: "EVALUACIÓN: Entrevista y presentación (10 min)." }] }
+        ];
+
+        // GLOSARIO MASIVO (50 POR CATEGORÍA = 200 PALABRAS)
+        const vocabData = [
+            // TEOCRÁTICO (50)
+            { term: "Elder", cat: "Teocrático", eng: "Anciano", example: "The elders provide spiritual help." },
+            { term: "Pioneer", cat: "Teocrático", eng: "Precursor(a)", example: "She serves as a regular pioneer." },
+            { term: "Publisher", cat: "Teocrático", eng: "Publicador", example: "He is an unbaptized publisher." },
+            { term: "Congregation", cat: "Teocrático", eng: "Congregación", example: "Our congregation has 100 members." },
+            { term: "Kingdom Hall", cat: "Teocrático", eng: "Salón del Reino", example: "We clean the Kingdom Hall." },
+            { term: "Meeting", cat: "Teocrático", eng: "Reunión", example: "The meeting starts at 7 PM." },
+            { term: "Memorial", cat: "Teocrático", eng: "Conmemoración", example: "We invite you to the Memorial." },
+            { term: "Assembly", cat: "Teocrático", eng: "Asamblea (Circuito)", example: "The circuit assembly is next month." },
+            { term: "Convention", cat: "Teocrático", eng: "Asamblea (Regional)", example: "I love the regional convention." },
+            { term: "Preaching work", cat: "Teocrático", eng: "Obra de predicación", example: "We share in the preaching work." },
+            { term: "Ministry", cat: "Teocrático", eng: "Ministerio", example: "Paul loved his ministry." },
+            { term: "Bible study", cat: "Teocrático", eng: "Estudio Bíblico", example: "I conduct a Bible study." },
+            { term: "Return visit", cat: "Teocrático", eng: "Revisita", example: "I have a return visit today." },
+            { term: "Cart witnessing", cat: "Teocrático", eng: "Predicación pública", example: "Cart witnessing is effective." },
+            { term: "House-to-house", cat: "Teocrático", eng: "De casa en casa", example: "We preach house-to-house." },
+            { term: "Tract", cat: "Teocrático", eng: "Tratado", example: "Would you like to read this tract?" },
+            { term: "Brochure", cat: "Teocrático", eng: "Folleto", example: "This brochure answers your question." },
+            { term: "Magazine", cat: "Teocrático", eng: "Revista", example: "I brought you a new magazine." },
+            { term: "Watchtower", cat: "Teocrático", eng: "La Atalaya", example: "We study the Watchtower on weekends." },
+            { term: "Awake!", cat: "Teocrático", eng: "¡Despertad!", example: "The Awake! magazine is very interesting." },
+            { term: "Prayer", cat: "Teocrático", eng: "Oración", example: "Prayer gives us comfort." },
+            { term: "Faith", cat: "Teocrático", eng: "Fe", example: "We need strong faith." },
+            { term: "Hope", cat: "Teocrático", eng: "Esperanza", example: "Our hope is real." },
+            { term: "Love", cat: "Teocrático", eng: "Amor", example: "God is love." },
+            { term: "Paradise", cat: "Teocrático", eng: "Paraíso", example: "The earth will be a paradise." },
+            { term: "Kingdom", cat: "Teocrático", eng: "Reino", example: "God's Kingdom will rule the earth." },
+            { term: "Jehovah", cat: "Teocrático", eng: "Jehová", example: "Jehovah is the true God." },
+            { term: "Jesus Christ", cat: "Teocrático", eng: "Jesucristo", example: "Jesus Christ is our King." },
+            { term: "Anointed", cat: "Teocrático", eng: "Ungido", example: "The anointed will rule in heaven." },
+            { term: "Great Tribulation", cat: "Teocrático", eng: "Gran Tribulación", example: "The Great Tribulation is coming." },
+            { term: "Armageddon", cat: "Teocrático", eng: "Armagedón", example: "Armageddon is God's war." },
+            { term: "Resurrection", cat: "Teocrático", eng: "Resurrección", example: "I believe in the resurrection." },
+            { term: "Scripture", cat: "Teocrático", eng: "Escritura (Texto)", example: "Read this scripture." },
+            { term: "Verse", cat: "Teocrático", eng: "Versículo", example: "Look at verse 5." },
+            { term: "Chapter", cat: "Teocrático", eng: "Capítulo", example: "Open chapter 3." },
+            { term: "Book", cat: "Teocrático", eng: "Libro", example: "The book of Genesis." },
+            { term: "Songbook", cat: "Teocrático", eng: "Cancionero", example: "Open your songbook to song 10." },
+            { term: "Broadcasting", cat: "Teocrático", eng: "Broadcasting (TV)", example: "We watch the monthly broadcasting." },
+            { term: "Governing Body", cat: "Teocrático", eng: "Cuerpo Gobernante", example: "The Governing Body directs the work." },
+            { term: "Circuit Overseer", cat: "Teocrático", eng: "Superintendente de Circuito", example: "The circuit overseer is visiting us." },
+            { term: "Ministerial Servant", cat: "Teocrático", eng: "Siervo Ministerial", example: "He is a ministerial servant." },
+            { term: "Shepherd", cat: "Teocrático", eng: "Pastor (Espiritual)", example: "Elders are spiritual shepherds." },
+            { term: "Dedication", cat: "Teocrático", eng: "Dedicación", example: "Dedication is a personal promise." },
+            { term: "Baptism", cat: "Teocrático", eng: "Bautismo", example: "His baptism was very touching." },
+            { term: "Disfellowship", cat: "Teocrático", eng: "Expulsar", example: "The action to disfellowship is out of love." },
+            { term: "Repentance", cat: "Teocrático", eng: "Arrepentimiento", example: "Repentance is necessary." },
+            { term: "Forgiveness", cat: "Teocrático", eng: "Perdón", example: "Jehovah's forgiveness is great." },
+            { term: "Spiritual", cat: "Teocrático", eng: "Espiritual", example: "We have spiritual goals." },
+            { term: "Worldly", cat: "Teocrático", eng: "Mundano", example: "Avoid bad worldly habits." },
+            { term: "Truth", cat: "Teocrático", eng: "Verdad", example: "We must live in the truth." },
+
+            // HÁBITOS (50)
+            { term: "Wake up", cat: "Hábitos", eng: "Despertarse", example: "I wake up at 6 AM." },
+            { term: "Get up", cat: "Hábitos", eng: "Levantarse", example: "I get up 10 minutes later." },
+            { term: "Take a shower", cat: "Hábitos", eng: "Bañarse", example: "I take a shower every morning." },
+            { term: "Brush teeth", cat: "Hábitos", eng: "Cepillarse", example: "Don't forget to brush your teeth." },
+            { term: "Comb hair", cat: "Hábitos", eng: "Peinarse", example: "I comb my hair quickly." },
+            { term: "Get dressed", cat: "Hábitos", eng: "Vestirse", example: "I get dressed for work." },
+            { term: "Put on makeup", cat: "Hábitos", eng: "Maquillarse", example: "She puts on makeup." },
+            { term: "Shave", cat: "Hábitos", eng: "Afeitarse", example: "He shaves his beard." },
+            { term: "Make breakfast", cat: "Hábitos", eng: "Hacer el desayuno", example: "I make breakfast for my family." },
+            { term: "Have breakfast", cat: "Hábitos", eng: "Desayunar", example: "We have breakfast together." },
+            { term: "Drink coffee", cat: "Hábitos", eng: "Tomar café", example: "I drink coffee to wake up." },
+            { term: "Leave home", cat: "Hábitos", eng: "Salir de casa", example: "I leave home at 7:30." },
+            { term: "Lock the door", cat: "Hábitos", eng: "Echar llave", example: "Always lock the door." },
+            { term: "Commute", cat: "Hábitos", eng: "Viajar al trabajo/estudio", example: "My commute is long." },
+            { term: "Take the bus", cat: "Hábitos", eng: "Tomar el bus", example: "I take the bus downtown." },
+            { term: "Drive to work", cat: "Hábitos", eng: "Manejar al trabajo", example: "I drive to work every day." },
+            { term: "Arrive at work", cat: "Hábitos", eng: "Llegar al trabajo", example: "I arrive at work early." },
+            { term: "Start working", cat: "Hábitos", eng: "Empezar a trabajar", example: "We start working at 8 AM." },
+            { term: "Check emails", cat: "Hábitos", eng: "Revisar correos", example: "First, I check my emails." },
+            { term: "Have lunch", cat: "Hábitos", eng: "Almorzar", example: "I have lunch at noon." },
+            { term: "Take a break", cat: "Hábitos", eng: "Tomar un descanso", example: "Let's take a 15-minute break." },
+            { term: "Finish work", cat: "Hábitos", eng: "Terminar de trabajar", example: "I finish work at 5 PM." },
+            { term: "Go home", cat: "Hábitos", eng: "Ir a casa", example: "I go home and relax." },
+            { term: "Buy groceries", cat: "Hábitos", eng: "Comprar comida", example: "I buy groceries on Fridays." },
+            { term: "Cook dinner", cat: "Hábitos", eng: "Cocinar la cena", example: "I love to cook dinner." },
+            { term: "Have dinner", cat: "Hábitos", eng: "Cenar", example: "We have dinner at 8 PM." },
+            { term: "Wash the dishes", cat: "Hábitos", eng: "Lavar platos", example: "Please wash the dishes." },
+            { term: "Watch TV", cat: "Hábitos", eng: "Ver televisión", example: "I watch TV for an hour." },
+            { term: "Read a book", cat: "Hábitos", eng: "Leer un libro", example: "I read a book before bed." },
+            { term: "Listen to music", cat: "Hábitos", eng: "Escuchar música", example: "I listen to music while cleaning." },
+            { term: "Check social media", cat: "Hábitos", eng: "Revisar redes sociales", example: "I check social media on my phone." },
+            { term: "Call a friend", cat: "Hábitos", eng: "Llamar a un amigo", example: "I call a friend on weekends." },
+            { term: "Do the laundry", cat: "Hábitos", eng: "Lavar ropa", example: "I do the laundry on Sunday." },
+            { term: "Iron clothes", cat: "Hábitos", eng: "Planchar ropa", example: "I hate to iron clothes." },
+            { term: "Sweep the floor", cat: "Hábitos", eng: "Barrer", example: "I sweep the floor every day." },
+            { term: "Mop the floor", cat: "Hábitos", eng: "Trapear", example: "I mop the floor twice a week." },
+            { term: "Take out the trash", cat: "Hábitos", eng: "Sacar la basura", example: "Take out the trash, please." },
+            { term: "Feed the pet", cat: "Hábitos", eng: "Alimentar mascota", example: "I feed the dog." },
+            { term: "Water the plants", cat: "Hábitos", eng: "Regar las plantas", example: "Don't forget to water the plants." },
+            { term: "Go for a walk", cat: "Hábitos", eng: "Salir a caminar", example: "I go for a walk in the evening." },
+            { term: "Exercise", cat: "Hábitos", eng: "Hacer ejercicio", example: "I exercise three times a week." },
+            { term: "Take a nap", cat: "Hábitos", eng: "Tomar una siesta", example: "I take a nap on Sundays." },
+            { term: "Set the alarm", cat: "Hábitos", eng: "Poner la alarma", example: "I set the alarm for 6 AM." },
+            { term: "Go to bed", cat: "Hábitos", eng: "Acostarse", example: "I go to bed at 10 PM." },
+            { term: "Fall asleep", cat: "Hábitos", eng: "Quedarse dormido", example: "I fall asleep quickly." },
+            { term: "Pray", cat: "Hábitos", eng: "Orar", example: "I pray before sleeping." },
+            { term: "Study", cat: "Hábitos", eng: "Estudiar", example: "I study English every day." },
+            { term: "Meditate", cat: "Hábitos", eng: "Meditar", example: "I meditate on Bible principles." },
+            { term: "Relax", cat: "Hábitos", eng: "Relajarse", example: "It's time to relax." },
+            { term: "Plan the day", cat: "Hábitos", eng: "Planear el día", example: "I plan the day in the morning." },
+
+            // VERBOS (50)
+            { term: "Be", cat: "Verbos", eng: "Ser / Estar", example: "I am happy to be here." },
+            { term: "Have", cat: "Verbos", eng: "Tener", example: "I have a lot of time." },
+            { term: "Do", cat: "Verbos", eng: "Hacer (Acción)", example: "I do my best." },
+            { term: "Make", cat: "Verbos", eng: "Hacer (Fabricar)", example: "I make good coffee." },
+            { term: "Go", cat: "Verbos", eng: "Ir", example: "We go to the park." },
+            { term: "Come", cat: "Verbos", eng: "Venir", example: "Come with me." },
+            { term: "Take", cat: "Verbos", eng: "Tomar", example: "Take this book." },
+            { term: "Give", cat: "Verbos", eng: "Dar", example: "Give me a minute." },
+            { term: "Get", cat: "Verbos", eng: "Obtener / Conseguir", example: "I get a new job." },
+            { term: "Find", cat: "Verbos", eng: "Encontrar", example: "I can't find my keys." },
+            { term: "Think", cat: "Verbos", eng: "Pensar", example: "I think it is a good idea." },
+            { term: "Look", cat: "Verbos", eng: "Mirar", example: "Look at the sky." },
+            { term: "See", cat: "Verbos", eng: "Ver", example: "I see a bird." },
+            { term: "Use", cat: "Verbos", eng: "Usar", example: "I use my phone." },
+            { term: "Tell", cat: "Verbos", eng: "Decir (a alguien)", example: "Tell me the truth." },
+            { term: "Ask", cat: "Verbos", eng: "Preguntar / Pedir", example: "Ask a question." },
+            { term: "Work", cat: "Verbos", eng: "Trabajar", example: "I work every day." },
+            { term: "Seem", cat: "Verbos", eng: "Parecer", example: "It seems difficult." },
+            { term: "Feel", cat: "Verbos", eng: "Sentir", example: "I feel good." },
+            { term: "Try", cat: "Verbos", eng: "Intentar", example: "Try to do it." },
+            { term: "Leave", cat: "Verbos", eng: "Dejar / Irse", example: "Leave it here." },
+            { term: "Call", cat: "Verbos", eng: "Llamar", example: "Call your mother." },
+            { term: "Need", cat: "Verbos", eng: "Necesitar", example: "I need some water." },
+            { term: "Want", cat: "Verbos", eng: "Querer", example: "I want to learn." },
+            { term: "Mean", cat: "Verbos", eng: "Significar", example: "What does this mean?" },
+            { term: "Keep", cat: "Verbos", eng: "Mantener / Guardar", example: "Keep the secret." },
+            { term: "Let", cat: "Verbos", eng: "Permitir / Dejar", example: "Let me go." },
+            { term: "Begin", cat: "Verbos", eng: "Empezar", example: "We begin now." },
+            { term: "Start", cat: "Verbos", eng: "Comenzar", example: "Start the car." },
+            { term: "Help", cat: "Verbos", eng: "Ayudar", example: "Please help me." },
+            { term: "Talk", cat: "Verbos", eng: "Hablar (Conversar)", example: "Let's talk about it." },
+            { term: "Turn", cat: "Verbos", eng: "Girar / Voltear", example: "Turn left here." },
+            { term: "Show", cat: "Verbos", eng: "Mostrar", example: "Show me the picture." },
+            { term: "Hear", cat: "Verbos", eng: "Oír", example: "Did you hear that?" },
+            { term: "Play", cat: "Verbos", eng: "Jugar / Tocar", example: "I play the piano." },
+            { term: "Run", cat: "Verbos", eng: "Correr", example: "I run fast." },
+            { term: "Move", cat: "Verbos", eng: "Mover / Mudarse", example: "Move the table." },
+            { term: "Like", cat: "Verbos", eng: "Gustar", example: "I like chocolate." },
+            { term: "Live", cat: "Verbos", eng: "Vivir", example: "I live in the city." },
+            { term: "Believe", cat: "Verbos", eng: "Creer", example: "I believe you." },
+            { term: "Hold", cat: "Verbos", eng: "Sostener", example: "Hold my hand." },
+            { term: "Bring", cat: "Verbos", eng: "Traer", example: "Bring some food." },
+            { term: "Happen", cat: "Verbos", eng: "Suceder", example: "What happened?" },
+            { term: "Write", cat: "Verbos", eng: "Escribir", example: "Write a letter." },
+            { term: "Provide", cat: "Verbos", eng: "Proveer", example: "They provide help." },
+            { term: "Sit", cat: "Verbos", eng: "Sentarse", example: "Sit down." },
+            { term: "Stand", cat: "Verbos", eng: "Pararse", example: "Stand up." },
+            { term: "Lose", cat: "Verbos", eng: "Perder", example: "Don't lose it." },
+            { term: "Pay", cat: "Verbos", eng: "Pagar", example: "I will pay the bill." },
+            { term: "Meet", cat: "Verbos", eng: "Conocer / Reunirse", example: "Nice to meet you." },
+
+            // LUGARES (50)
+            { term: "Grocery store", cat: "Lugares", eng: "Tienda de alimentos", example: "I buy milk at the grocery store." },
+            { term: "Supermarket", cat: "Lugares", eng: "Supermercado", example: "The supermarket is big." },
+            { term: "Pharmacy", cat: "Lugares", eng: "Farmacia", example: "I need medicine from the pharmacy." },
+            { term: "Bakery", cat: "Lugares", eng: "Panadería", example: "The bakery smells like fresh bread." },
+            { term: "Butcher shop", cat: "Lugares", eng: "Carnicería", example: "Buy meat at the butcher shop." },
+            { term: "Cafe", cat: "Lugares", eng: "Cafetería", example: "Let's drink espresso at the cafe." },
+            { term: "Restaurant", cat: "Lugares", eng: "Restaurante", example: "This restaurant has good food." },
+            { term: "Bank", cat: "Lugares", eng: "Banco", example: "I need to go to the bank." },
+            { term: "Post office", cat: "Lugares", eng: "Oficina de correos", example: "Send the letter at the post office." },
+            { term: "Hospital", cat: "Lugares", eng: "Hospital", example: "The hospital is open 24/7." },
+            { term: "Clinic", cat: "Lugares", eng: "Clínica", example: "She went to the dental clinic." },
+            { term: "Police station", cat: "Lugares", eng: "Estación de policía", example: "The police station is nearby." },
+            { term: "Fire station", cat: "Lugares", eng: "Estación de bomberos", example: "The fire station is on Main Street." },
+            { term: "School", cat: "Lugares", eng: "Escuela", example: "Children learn at school." },
+            { term: "University", cat: "Lugares", eng: "Universidad", example: "He studies at the university." },
+            { term: "Library", cat: "Lugares", eng: "Biblioteca", example: "Be quiet in the library." },
+            { term: "Bookstore", cat: "Lugares", eng: "Librería", example: "I bought a novel at the bookstore." },
+            { term: "Museum", cat: "Lugares", eng: "Museo", example: "The museum has old paintings." },
+            { term: "Theater", cat: "Lugares", eng: "Teatro", example: "We watched a play at the theater." },
+            { term: "Cinema", cat: "Lugares", eng: "Cine", example: "Let's watch a movie at the cinema." },
+            { term: "Park", cat: "Lugares", eng: "Parque", example: "The park has many trees." },
+            { term: "Square", cat: "Lugares", eng: "Plaza", example: "The town square is beautiful." },
+            { term: "Stadium", cat: "Lugares", eng: "Estadio", example: "The soccer game is at the stadium." },
+            { term: "Gym", cat: "Lugares", eng: "Gimnasio", example: "I exercise at the gym." },
+            { term: "Mall", cat: "Lugares", eng: "Centro comercial", example: "We went shopping at the mall." },
+            { term: "Clothing store", cat: "Lugares", eng: "Tienda de ropa", example: "I bought a shirt at the clothing store." },
+            { term: "Shoe store", cat: "Lugares", eng: "Zapatería", example: "The shoe store has a sale." },
+            { term: "Hardware store", cat: "Lugares", eng: "Ferretería", example: "Buy tools at the hardware store." },
+            { term: "Hair salon", cat: "Lugares", eng: "Peluquería", example: "She got a haircut at the hair salon." },
+            { term: "Barbershop", cat: "Lugares", eng: "Barbería", example: "He went to the barbershop." },
+            { term: "Airport", cat: "Lugares", eng: "Aeropuerto", example: "Our flight leaves from the airport." },
+            { term: "Train station", cat: "Lugares", eng: "Estación de tren", example: "The train arrives at the station." },
+            { term: "Bus station", cat: "Lugares", eng: "Estación de autobuses", example: "We wait at the bus station." },
+            { term: "Subway station", cat: "Lugares", eng: "Estación de metro", example: "The subway station is underground." },
+            { term: "Gas station", cat: "Lugares", eng: "Gasolinera", example: "We need fuel from the gas station." },
+            { term: "Parking lot", cat: "Lugares", eng: "Estacionamiento", example: "Park the car in the parking lot." },
+            { term: "Hotel", cat: "Lugares", eng: "Hotel", example: "We stayed at a nice hotel." },
+            { term: "Church", cat: "Lugares", eng: "Iglesia", example: "The church has a tall tower." },
+            { term: "Factory", cat: "Lugares", eng: "Fábrica", example: "He works in a car factory." },
+            { term: "Office building", cat: "Lugares", eng: "Edificio de oficinas", example: "Her company is in that office building." },
+            { term: "Downtown", cat: "Lugares", eng: "Centro de la ciudad", example: "Downtown is very busy." },
+            { term: "Neighborhood", cat: "Lugares", eng: "Barrio", example: "My neighborhood is safe." },
+            { term: "Suburb", cat: "Lugares", eng: "Suburbio", example: "They live in a quiet suburb." },
+            { term: "Street", cat: "Lugares", eng: "Calle", example: "Walk down this street." },
+            { term: "Avenue", cat: "Lugares", eng: "Avenida", example: "The shop is on 5th Avenue." },
+            { term: "Boulevard", cat: "Lugares", eng: "Bulevar", example: "Drive along the boulevard." },
+            { term: "Corner", cat: "Lugares", eng: "Esquina", example: "The bank is on the corner." },
+            { term: "Intersection", cat: "Lugares", eng: "Intersección / Cruce", example: "Stop at the intersection." },
+            { term: "Crosswalk", cat: "Lugares", eng: "Paso de peatones", example: "Use the crosswalk to cross the street." },
+            { term: "Highway", cat: "Lugares", eng: "Autopista", example: "The highway goes to the next city." }
+        ];
+
+        let radarChartInstance = null;
+
+        function navigate(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            document.getElementById('nav-' + viewId).classList.add('active');
+            
+            if(viewId === 'inicio' && !radarChartInstance) initRadarChart();
+            if(viewId === 'recursos') openGlossaryTab('Todos'); 
+        }
+
+        function filterMonths(monthNum) {
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active', 'bg-white', 'shadow-sm', 'border-slate-200', 'border-t-2', 'border-l-2', 'border-r-2'));
+            const activeTab = document.getElementById('tab-month-' + monthNum);
+            activeTab.classList.add('active', 'bg-white', 'border-slate-200', 'border-t-2', 'border-l-2', 'border-r-2');
+            
+            const grid = document.getElementById('weeks-grid');
+            grid.innerHTML = '';
+            const filteredWeeks = weeklyData.filter(w => w.month === monthNum);
+            
+            filteredWeeks.forEach(week => {
+                const card = document.createElement('div');
+                card.className = "week-card bg-white rounded-2xl p-6 border border-slate-200 flex flex-col h-full";
+                card.onclick = () => openWeekDetails(week.week);
+                
+                card.innerHTML = `
+                    <div class="mb-3">
+                        <span class="text-xs font-extrabold text-blue-700 uppercase tracking-widest bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-lg">Semana ${week.week}</span>
+                    </div>
+                    <h4 class="font-extrabold text-blue-900 text-xl mb-3">${week.title}</h4>
+                    <p class="text-sm text-slate-600 mb-6 font-medium">${week.summary}</p>
+                    <div class="mt-auto pt-4 border-t border-slate-100 flex justify-between items-center text-emerald-600 text-sm font-bold">
+                        <span>Ver Temario Completo</span>
+                        <span class="text-lg">→</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function openWeekDetails(weekNumber) {
+            const data = weeklyData.find(w => w.week === weekNumber);
+            if(!data) return;
+
+            document.getElementById('modal-subtitle').textContent = `Mes ${data.month} • Semana ${data.week}`;
+            document.getElementById('modal-title').textContent = data.title;
+
+            const grammarHTML = data.grammar.map(g => `<li class="flex items-start mb-3"><span class="text-blue-500 mr-3 text-lg mt-0.5">🔹</span> <span class="text-slate-700 font-medium text-base">${g}</span></li>`).join('');
+            const classesHTML = data.classes.map(c => `
+                <div class="bg-white p-5 border border-slate-200 rounded-xl shadow-sm">
+                    <div class="text-xs font-extrabold text-emerald-600 uppercase tracking-widest mb-2">
+                        Día ${c.num}
+                    </div>
+                    <div class="text-slate-800 font-bold text-base leading-relaxed">${c.focus}</div>
+                </div>
+            `).join('');
+
+            const modalBody = document.getElementById('modal-body');
+            modalBody.innerHTML = `
+                <p class="text-lg text-blue-900 mb-8 font-bold border-l-8 border-emerald-400 pl-5 bg-white p-5 rounded-r-2xl shadow-sm leading-relaxed">${data.summary}</p>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    <div class="space-y-6">
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <h4 class="text-lg font-extrabold text-blue-900 mb-5 flex items-center gap-3"><span class="text-2xl">📘</span> Reglas Gramaticales</h4>
+                            <ul>${grammarHTML}</ul>
+                        </div>
+                        <div class="bg-amber-50 p-6 rounded-2xl border border-amber-200 shadow-sm">
+                            <h4 class="text-lg font-extrabold text-amber-900 mb-3 flex items-center gap-3"><span class="text-2xl">🗣️</span> Foco Fonético</h4>
+                            <p class="text-base text-amber-950 font-bold leading-relaxed">${data.phonetics}</p>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <h4 class="text-lg font-extrabold text-blue-900 mb-5 flex items-center gap-3"><span class="text-2xl">📚</span> Vocabulario Clave</h4>
+                            <div class="space-y-5">
+                                <div>
+                                    <span class="text-xs font-extrabold text-slate-400 uppercase tracking-widest block mb-2">Inglés Diario</span>
+                                    <p class="text-base text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-100 font-medium">${data.vocabGen}</p>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-extrabold text-emerald-600 uppercase tracking-widest block mb-2">Inglés Teocrático</span>
+                                    <p class="text-base text-emerald-900 bg-emerald-50 border-2 border-emerald-100 p-3 rounded-xl font-bold">${data.vocabTeo}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-blue-800 p-6 rounded-2xl shadow-sm">
+                            <h4 class="text-base font-extrabold text-blue-200 mb-3 flex items-center gap-3"><span class="text-2xl">💡</span> Autoestudio</h4>
+                            <p class="text-base text-white font-medium leading-relaxed">${data.selfStudy}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-100 p-6 rounded-2xl border border-slate-200">
+                    <h4 class="text-lg font-extrabold text-blue-900 mb-5 flex items-center gap-3"><span class="text-2xl">📅</span> Plan de Clases</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        ${classesHTML}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('week-modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('week-modal').classList.remove('active');
+        }
+
+        document.getElementById('week-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        let currentVocabCategory = 'Todos';
+        const categoryInfo = {
+            'Todos': { title: 'Todos los términos', icon: '🔍' },
+            'Hábitos': { title: 'Hábitos y Vida Diaria', icon: '☕' },
+            'Teocrático': { title: 'Inglés Teocrático (JW)', icon: '🕊️' },
+            'Verbos': { title: 'Verbos de Acción Clave', icon: '🏃‍♀️' },
+            'Lugares': { title: 'Lugares y Ciudad', icon: '🏙️' }
+        };
+
+        function openGlossaryTab(category) {
+            currentVocabCategory = category;
+            
+            document.querySelectorAll('.glossary-tab').forEach(btn => {
+                const isSelected = btn.id === `g-tab-${category}`;
+                if(isSelected) {
+                    btn.classList.add('bg-blue-800', 'text-white', 'shadow-md');
+                    btn.classList.remove('bg-white', 'text-blue-900', 'text-emerald-700');
+                } else {
+                    btn.classList.remove('bg-blue-800', 'text-white', 'shadow-md');
+                    btn.classList.add('bg-white');
+                    if(btn.id === 'g-tab-Teocrático') btn.classList.add('text-emerald-700');
+                    else btn.classList.add('text-blue-900');
+                }
+            });
+
+            const info = categoryInfo[category];
+            document.getElementById('glossary-dynamic-title').innerHTML = `${info.icon} Explorando: ${info.title}`;
+            document.getElementById('search-vocab').value = '';
+            renderVocab();
+        }
+
+        function handleSearch() { renderVocab(); }
+
+        function renderVocab() {
+            const grid = document.getElementById('vocab-grid');
+            const noResults = document.getElementById('no-results');
+            const searchTerm = document.getElementById('search-vocab').value.toLowerCase();
+            
+            grid.innerHTML = '';
+            
+            const filtered = vocabData.filter(v => {
+                const matchCategory = currentVocabCategory === 'Todos' ? true : v.cat === currentVocabCategory;
+                const matchSearch = v.term.toLowerCase().includes(searchTerm) || v.eng.toLowerCase().includes(searchTerm);
+                return matchCategory && matchSearch;
+            });
+
+            if(filtered.length === 0) {
+                grid.classList.add('hidden');
+                noResults.classList.remove('hidden');
+            } else {
+                grid.classList.remove('hidden');
+                noResults.classList.add('hidden');
+                
+                filtered.forEach(item => {
+                    let catColor = "text-blue-700 bg-blue-50";
+                    let markerColor = "bg-blue-400";
+                    if(item.cat === 'Teocrático') { catColor = "text-emerald-800 bg-emerald-50"; markerColor = "bg-emerald-400"; }
+                    if(item.cat === 'Verbos') { catColor = "text-amber-800 bg-amber-50"; markerColor = "bg-amber-400"; }
+                    
+                    grid.innerHTML += `
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition flex flex-col relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-1.5 h-full ${markerColor}"></div>
+                            <div class="flex flex-col ml-2">
+                                <span class="font-extrabold text-lg text-slate-800 mb-1">${item.term}</span>
+                                <span class="text-[10px] font-extrabold uppercase tracking-widest ${catColor} px-2.5 py-1 rounded w-fit mb-3">${item.cat}</span>
+                                <div class="text-sm text-blue-900 font-bold mb-3 pb-3 border-b-2 border-slate-50">= ${item.eng}</div>
+                                <div class="text-sm text-slate-600 italic font-medium bg-slate-50 p-2 rounded-lg">"${item.example}"</div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function initRadarChart() {
+            const ctx = document.getElementById('progressRadarChart').getContext('2d');
+            radarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Fluidez', 'Gramática', 'Acento', 'Vocab. Diario', 'Vocab. JW', 'Autoestudio'],
+                    datasets: [
+                        { label: 'Hoy', data: [25, 35, 20, 30, 25, 10], fill: true, backgroundColor: 'rgba(148, 163, 184, 0.3)', borderColor: 'rgb(148, 163, 184)', pointBackgroundColor: 'rgb(148, 163, 184)', borderWidth: 2 },
+                        { label: 'Mes 3', data: [85, 80, 80, 85, 95, 85], fill: true, backgroundColor: 'rgba(16, 185, 129, 0.25)', borderColor: 'rgb(16, 185, 129)', pointBackgroundColor: 'rgb(16, 185, 129)', borderWidth: 3 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { r: { angleLines: { color: 'rgba(0,0,0,0.08)' }, grid: { color: 'rgba(0,0,0,0.08)' }, ticks: { display: false, min: 0, max: 100 }, pointLabels: { font: { family: 'Inter', size: 12, weight: '700' }, color: '#1e3a8a' } } },
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: {family: 'Inter', size: 12, weight: '600'} } } }
+                }
+            });
+        }
+
+        window.onload = () => {
+            initRadarChart();
+            filterMonths(1);
+            openGlossaryTab('Todos');
+            
+            document.addEventListener('keydown', (e) => {
+                if (e.key === "Escape") closeModal();
+            });
+        };
+    </script>
+</body>
+</html>
