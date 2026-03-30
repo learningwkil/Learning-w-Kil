@@ -1,722 +1,974 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sindy Maya (Kiki 🐨) - Learning w' Kil</title>
+    <title>Learning w' Kil 🐨 - Your Koala Space</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #334155; overflow: hidden; }
-        
-        .chart-container {
-            position: relative; width: 100%; max-width: 550px;
-            margin-left: auto; margin-right: auto; height: 300px; max-height: 400px;
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { dark: '#0F172A', slate: { 50:'#f8fafc', 100:'#f1f5f9', 200:'#e2e8f0', 800:'#1e293b', 900:'#0f172a' } },
+                    boxShadow: { soft: '0 4px 20px -2px rgba(0, 0, 0, 0.05)', floating: '0 10px 25px -5px rgba(0, 0, 0, 0.1)' }
+                }
+            }
         }
-        @media (min-width: 768px) { .chart-container { height: 350px; } }
+    </script>
 
-        .view-section { display: none; height: 100%; overflow-y: auto; animation: fadeIn 0.3s ease-in-out; }
-        .view-section.active { display: block; }
+    <style>
+        body { background-color: #f8fafc; background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 32px 32px; color: #0F172A; overflow-x: hidden; }
+        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(16px); border-right: 1px solid rgba(226, 232, 240, 0.8); }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .modal-overlay { display: none; animation: fadeIn 0.2s ease-out; }
-        .modal-overlay.active { display: flex; }
-        .modal-content { animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        .nav-btn { transition: all 0.2s ease; border-left: 4px solid transparent; }
-        .nav-btn:hover { background-color: rgba(16, 185, 129, 0.15); }
-        .nav-btn.active { background-color: #10b981; color: white; border-left-color: #059669; font-weight: 700; }
-        
-        .tab-btn { border-bottom: 3px solid transparent; transition: all 0.2s; }
-        .tab-btn.active { border-bottom-color: #10b981; color: #1e3a8a; font-weight: 800; }
-        
-        .week-card { transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; border-top: 4px solid #3b82f6; }
-        .week-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px -3px rgba(59, 130, 246, 0.2); }
-
-        .glossary-tab { transition: all 0.2s; }
-        .glossary-tab.active { background-color: #1e40af; color: white; transform: translateY(-2px); box-shadow: 0 6px 10px -2px rgba(30, 64, 175, 0.3); }
-        
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        .tab-pill { transition: all 0.3s ease; }
+        .tab-pill-active { background-color: white; color: #0F172A; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); transform: translateY(-2px); }
+        .tab-pill-inactive { color: #64748b; }
+        .flashcard { perspective: 1000px; height: 250px; cursor: pointer; }
+        .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 1.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 15px -3px rgba(0,0,0,0.05); padding: 1.5rem; }
+        .flashcard-front { background: white; border: 2px solid #f1f5f9; font-size: 6rem; }
+        .flashcard-back { transform: rotateY(180deg); }
+        .bounce { animation: bounce 0.4s; }
+        @keyframes bounce { 0%, 100% {transform: scale(1);} 50% {transform: scale(1.03);} }
+        .shake { animation: shake 0.4s; }
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
     </style>
 </head>
-<body class="antialiased h-screen flex flex-col md:flex-row">
+<body class="flex h-screen w-full antialiased">
 
-    <!-- Chosen Palette: Blue & Emerald Green. Typography size has been increased globally for better readability. Added massive 200+ word glossary. -->
+    <!-- Mobile Header -->
+    <header class="md:hidden fixed top-0 w-full bg-white/90 backdrop-blur-md z-40 h-16 flex items-center justify-between px-5 shadow-sm border-b border-slate-200">
+        <div class="flex items-center gap-2 font-black text-slate-800 text-xl tracking-tight"><span>🐨</span> L w' Kil</div>
+        <button id="btn-menu" class="text-2xl text-dark p-2">☰</button>
+    </header>
 
-    <nav class="w-full md:w-72 bg-blue-900 flex-shrink-0 flex flex-col shadow-xl z-20 text-white h-auto md:h-full">
-        <div class="p-6 border-b border-blue-800 bg-blue-950 flex flex-col items-center md:items-start text-center md:text-left">
-            <div class="text-5xl mb-3">🐨</div>
-            <h1 class="text-2xl font-extrabold tracking-tight text-emerald-400">Sindy Maya</h1>
-            <p class="text-sm uppercase font-extrabold tracking-widest text-blue-200 mt-1">Kiki 🐨</p>
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed md:relative z-50 w-80 h-full glass transform -translate-x-full md:translate-x-0 transition-transform duration-300 flex flex-col">
+        <div class="p-8 hidden md:flex flex-col gap-1 border-b border-slate-100">
+            <div class="flex items-center gap-3 font-black text-2xl text-slate-800 tracking-tight"><span class="text-4xl">🐨</span> Learning w' Kil</div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-12">Your Koala🐨 space</span>
         </div>
-        <div class="flex-1 overflow-y-auto py-4 flex flex-row md:flex-col overflow-x-auto md:overflow-hidden gap-2 px-4">
-            <button onclick="navigate('inicio')" id="nav-inicio" class="nav-btn active flex-1 text-left px-5 py-4 rounded-xl text-base font-semibold text-blue-50 whitespace-nowrap md:whitespace-normal flex items-center gap-3">
-                <span class="text-xl">🏠</span> Inicio
-            </button>
-            <button onclick="navigate('rutina')" id="nav-rutina" class="nav-btn flex-1 text-left px-5 py-4 rounded-xl text-base font-semibold text-blue-50 whitespace-nowrap md:whitespace-normal flex items-center gap-3">
-                <span class="text-xl">📅</span> Temario
-            </button>
-            <button onclick="navigate('recursos')" id="nav-recursos" class="nav-btn flex-1 text-left px-5 py-4 rounded-xl text-base font-semibold text-blue-50 whitespace-nowrap md:whitespace-normal flex items-center gap-3">
-                <span class="text-xl">📚</span> Glosario
-            </button>
-            <button onclick="navigate('autoestudio')" id="nav-autoestudio" class="nav-btn flex-1 text-left px-5 py-4 rounded-xl text-base font-semibold text-blue-50 whitespace-nowrap md:whitespace-normal flex items-center gap-3">
-                <span class="text-xl">💡</span> Tips
-            </button>
-        </div>
-        <div class="p-4 bg-blue-950 text-xs text-blue-300 text-center uppercase tracking-wider font-bold hidden md:block">
-            Programa Intensivo A2+
-        </div>
-    </nav>
+        <nav class="flex-1 overflow-y-auto px-5 py-6 space-y-8" id="nav-modules"></nav>
+    </aside>
 
-    <main class="flex-1 bg-slate-50 relative h-[calc(100vh-160px)] md:h-screen">
-        
-        <!-- INICIO -->
-        <section id="inicio" class="view-section active">
-            <div class="bg-gradient-to-r from-blue-700 to-blue-500 text-white px-8 py-12 shadow-md relative overflow-hidden">
-                <div class="absolute top-0 right-0 opacity-10 text-9xl transform rotate-12 translate-x-10 -translate-y-4">🐨</div>
-                <div class="max-w-5xl mx-auto relative z-10">
-                    <h2 class="text-4xl font-extrabold mb-4">¡Hola Kiki! ¡Bienvenida! 🎉</h2>
-                    <p class="text-lg md:text-xl text-blue-50 leading-relaxed max-w-3xl font-medium">
-                        Qué felicidad tan inmensa tenerte aquí. Me hace muchísima ilusión ser tu apoyo en este hermoso proceso de aprendizaje. He preparado este programa de <strong>Learning w' Kil</strong> especialmente para ti, para que domines el inglés de una vez por todas, en tu vida diaria y en tu servicio a Jehová. ¡Vamos a lograr cosas increíbles juntas! 💚
-                    </p>
-                </div>
+    <div id="mobile-overlay" class="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-40 hidden transition-opacity"></div>
+
+    <!-- Main Content -->
+    <main class="flex-1 h-full overflow-y-auto pt-16 md:pt-0 relative bg-slate-50" id="main-content"></main>
+
+    <!-- AI Bot -->
+    <button id="btn-ai" class="fixed bottom-6 right-6 bg-slate-800 text-white w-14 h-14 rounded-full shadow-floating flex items-center justify-center text-2xl hover:bg-black transition-all transform hover:-translate-y-1 z-50">🤖</button>
+
+    <div id="ai-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center px-4">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm ai-close"></div>
+        <div class="bg-white w-full max-w-md h-[550px] rounded-[2rem] shadow-2xl relative flex flex-col overflow-hidden fade-in border border-slate-100">
+            <div class="bg-slate-800 p-5 text-white flex justify-between items-center">
+                <div class="font-bold flex items-center gap-2"><span>🐨</span> Kil AI Tutor</div>
+                <button class="ai-close text-3xl opacity-70 hover:opacity-100">&times;</button>
             </div>
-
-            <div class="max-w-6xl mx-auto p-6 md:p-10">
-                <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                    <div class="xl:col-span-2 space-y-8">
-                        <div>
-                            <h3 class="text-2xl font-extrabold text-blue-900 mb-6 border-b-4 border-emerald-400 pb-2 inline-block">Índice del Programa</h3>
-                            <p class="text-base text-slate-600 mb-6 font-medium">Este es tu mapa de ruta para los próximos 3 meses. Dirígete a la pestaña "Temario" en el menú para ver el detalle de cada semana y cada clase.</p>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                                    <h4 class="text-lg font-extrabold text-blue-800 mb-3 border-b-2 border-slate-100 pb-2 flex items-center gap-2"><span>1️⃣</span> Mes 1: Bases</h4>
-                                    <ul class="text-sm text-slate-700 space-y-2 list-disc pl-5 font-medium">
-                                        <li>To Be y Presentaciones</li>
-                                        <li>Fonética de las Vocales</li>
-                                        <li>Rutinas (Presente Simple)</li>
-                                        <li>La regla de Tercera Persona</li>
-                                        <li>Acciones en el momento</li>
-                                    </ul>
-                                </div>
-                                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                                    <h4 class="text-lg font-extrabold text-blue-800 mb-3 border-b-2 border-slate-100 pb-2 flex items-center gap-2"><span>2️⃣</span> Mes 2: Pasado</h4>
-                                    <ul class="text-sm text-slate-700 space-y-2 list-disc pl-5 font-medium">
-                                        <li>Gustos e Invitaciones</li>
-                                        <li>Pasado Regular (-ed)</li>
-                                        <li>Fonética del Pasado</li>
-                                        <li>Verbos Irregulares clave</li>
-                                        <li>Direcciones en la ciudad</li>
-                                    </ul>
-                                </div>
-                                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                                    <h4 class="text-lg font-extrabold text-blue-800 mb-3 border-b-2 border-slate-100 pb-2 flex items-center gap-2"><span>3️⃣</span> Mes 3: Futuro</h4>
-                                    <ul class="text-sm text-slate-700 space-y-2 list-disc pl-5 font-medium">
-                                        <li>Dar Consejos Bíblicos</li>
-                                        <li>Planes vs Promesas</li>
-                                        <li>Contracciones naturales</li>
-                                        <li>Comparativos</li>
-                                        <li>Fluidez y Presentaciones</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="xl:col-span-1">
-                        <div class="bg-white p-8 rounded-2xl shadow-md border border-slate-200 h-full flex flex-col">
-                            <h3 class="text-xl font-extrabold text-blue-900 mb-3 text-center">Tu Crecimiento Proyectado</h3>
-                            <p class="text-sm text-slate-600 text-center mb-6 font-medium">Evolución estimada de tus habilidades a lo largo de las 12 semanas de estudio intenso.</p>
-                            <div class="flex-1 w-full flex items-center justify-center">
-                                <div class="chart-container">
-                                    <canvas id="progressRadarChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div id="ai-chat" class="flex-1 p-5 overflow-y-auto flex flex-col gap-4 bg-slate-50">
+                <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm text-sm border border-gray-100 max-w-[85%] text-dark font-medium">Hello! Welcome to Your Koala space. Ask me anything. ✨</div>
             </div>
-        </section>
-
-        <!-- TEMARIO -->
-        <section id="rutina" class="view-section">
-            <div class="max-w-6xl mx-auto p-6 md:p-10">
-                <header class="mb-8 border-b-2 border-slate-200 pb-6">
-                    <h2 class="text-3xl font-extrabold text-blue-900">Temario Interactivo</h2>
-                    <p class="mt-3 text-lg text-slate-600 font-medium">
-                        Selecciona el mes y <strong>haz clic en cualquier semana</strong> para abrir tu guía de estudio detallada.
-                    </p>
-                </header>
-
-                <div class="flex space-x-4 border-b-2 border-slate-200 mb-8 overflow-x-auto pb-1">
-                    <button onclick="filterMonths(1)" id="tab-month-1" class="tab-btn active px-6 py-3 text-slate-500 hover:text-blue-800 whitespace-nowrap text-lg rounded-t-xl hover:bg-slate-100 font-bold">Mes 1: Bases</button>
-                    <button onclick="filterMonths(2)" id="tab-month-2" class="tab-btn px-6 py-3 text-slate-500 hover:text-blue-800 whitespace-nowrap text-lg rounded-t-xl hover:bg-slate-100 font-bold">Mes 2: Narrativa</button>
-                    <button onclick="filterMonths(3)" id="tab-month-3" class="tab-btn px-6 py-3 text-slate-500 hover:text-blue-800 whitespace-nowrap text-lg rounded-t-xl hover:bg-slate-100 font-bold">Mes 3: Futuro</button>
-                </div>
-
-                <div id="weeks-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-12">
-                    <!-- Javascript populates this -->
-                </div>
-            </div>
-        </section>
-
-        <!-- GLOSARIO (CON 200 PALABRAS) -->
-        <section id="recursos" class="view-section bg-slate-100 flex-col h-full">
-            <div class="bg-blue-900 text-white px-6 md:px-10 py-8 shadow-md flex-shrink-0">
-                <div class="max-w-6xl mx-auto">
-                    <h2 class="text-3xl font-extrabold mb-2 flex items-center gap-3">📖 El Gran Glosario de Kiki</h2>
-                    <p class="text-blue-200 text-base mb-6 font-medium">Tienes más de 50 palabras nuevas por cada categoría para estudiar. ¡Usa el buscador!</p>
-                    
-                    <div class="flex flex-wrap gap-3">
-                        <button onclick="openGlossaryTab('Todos')" id="g-tab-Todos" class="glossary-tab active px-5 py-2.5 rounded-xl bg-blue-800 text-white font-bold border border-blue-700 text-sm shadow-md">
-                            🔍 Todos
-                        </button>
-                        <button onclick="openGlossaryTab('Hábitos')" id="g-tab-Hábitos" class="glossary-tab px-5 py-2.5 rounded-xl bg-white text-blue-900 font-bold border border-slate-200 text-sm shadow-md">
-                            ☕ Vida Diaria
-                        </button>
-                        <button onclick="openGlossaryTab('Teocrático')" id="g-tab-Teocrático" class="glossary-tab px-5 py-2.5 rounded-xl bg-white text-emerald-700 font-bold border border-slate-200 text-sm shadow-md">
-                            🕊️ Teocrático (JW)
-                        </button>
-                        <button onclick="openGlossaryTab('Verbos')" id="g-tab-Verbos" class="glossary-tab px-5 py-2.5 rounded-xl bg-white text-blue-900 font-bold border border-slate-200 text-sm shadow-md">
-                            🏃‍♀️ Verbos
-                        </button>
-                        <button onclick="openGlossaryTab('Lugares')" id="g-tab-Lugares" class="glossary-tab px-5 py-2.5 rounded-xl bg-white text-blue-900 font-bold border border-slate-200 text-sm shadow-md">
-                            🏙️ Lugares
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex-1 overflow-y-auto p-6 md:p-10">
-                <div class="max-w-6xl mx-auto">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 bg-white p-5 rounded-2xl shadow-sm border border-slate-200 gap-4">
-                        <h3 id="glossary-dynamic-title" class="text-xl font-extrabold text-blue-800">Explorando: Todos</h3>
-                        <div class="w-full md:w-80 relative">
-                            <span class="absolute left-4 top-3.5 text-lg text-slate-400">🔍</span>
-                            <input type="text" id="search-vocab" placeholder="Buscar palabra en inglés o español..." class="w-full pl-12 pr-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 bg-slate-50 text-base font-medium" onkeyup="handleSearch()">
-                        </div>
-                    </div>
-
-                    <div id="vocab-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        <!-- Populated via JS -->
-                    </div>
-                    
-                    <div id="no-results" class="hidden text-center py-16 text-slate-500 bg-white rounded-2xl border border-slate-200 shadow-sm mt-6">
-                        <span class="text-6xl block mb-4">🧐</span>
-                        <p class="text-xl font-extrabold text-blue-900">Sin resultados, Kiki.</p>
-                        <p class="text-base mt-2 font-medium">Anótala en tu cuaderno para investigarla juntas.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- TIPS -->
-        <section id="autoestudio" class="view-section">
-            <div class="max-w-5xl mx-auto p-6 md:p-10">
-                <header class="mb-10 border-b-2 border-slate-200 pb-6">
-                    <h2 class="text-3xl font-extrabold text-blue-900 flex items-center gap-3">💡 Tips Autodidactas</h2>
-                    <p class="mt-3 text-lg text-slate-600 font-medium">Sindy, la clave de la fluidez es lo que haces cuando no estamos en clase. Usa estas herramientas:</p>
-                </header>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-                    <div class="bg-white p-8 rounded-2xl shadow-md border-t-8 border-t-emerald-500">
-                        <h3 class="text-xl font-extrabold text-blue-900 mb-4 flex items-center gap-3">
-                            <span class="bg-emerald-100 p-2 rounded-full text-xl">📱</span> Método JW Library
-                        </h3>
-                        <ul class="space-y-4 text-sm text-slate-700 bg-slate-50 p-6 rounded-xl border border-slate-100 font-medium leading-relaxed">
-                            <li><strong class="text-emerald-700 text-base">Lectura paralela:</strong> Abre La Atalaya, cambia el idioma de español a inglés y compara cómo se arman las oraciones completas.</li>
-                            <li><strong class="text-emerald-700 text-base">Shadowing (Eco):</strong> Reproduce el audio de un artículo, escucha a la persona y lee en voz alta exactamente al mismo tiempo imitando su acento.</li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-white p-8 rounded-2xl shadow-md border-t-8 border-t-blue-500">
-                        <h3 class="text-xl font-extrabold text-blue-900 mb-4 flex items-center gap-3">
-                            <span class="bg-blue-100 p-2 rounded-full text-xl">🗣️</span> Pronunciación Real
-                        </h3>
-                        <ol class="space-y-4 text-sm text-slate-700 bg-slate-50 p-6 rounded-xl border border-slate-100 font-medium leading-relaxed list-decimal pl-6">
-                            <li>Entra a la página web <strong>YouGlish.com</strong></li>
-                            <li>Escribe cualquier palabra (ejemplo: "righteousness").</li>
-                            <li>La página te mostrará videos reales de YouTube donde personas nativas pronuncian esa palabra en oraciones reales. Escucha y repite.</li>
-                        </ol>
-                    </div>
-                </div>
-                
-                <div class="bg-blue-50 border-2 border-blue-200 p-8 rounded-2xl shadow-sm text-center">
-                    <h3 class="text-2xl font-extrabold text-blue-900 mb-3">Tu Meta Diaria: 15 Minutos ⏱️</h3>
-                    <p class="text-base text-slate-700 font-medium max-w-2xl mx-auto">No intentes estudiar 3 horas seguidas el domingo. Te agotarás. Es mucho mejor dedicarle solo 15 minutos todos los días leyendo el texto diario en inglés o repasando tu glosario.</p>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- MODAL (TEMARIO DETALLADO) -->
-    <div id="week-modal" class="modal-overlay fixed inset-0 bg-slate-900 bg-opacity-75 z-50 justify-center items-center p-4 md:p-8 backdrop-blur-sm">
-        <div class="modal-content bg-white rounded-3xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden border-2 border-slate-200">
-            
-            <div class="bg-blue-700 p-6 md:p-8 flex justify-between items-start flex-shrink-0 relative overflow-hidden">
-                <div class="absolute top-0 right-0 opacity-10 text-8xl transform translate-x-4 -translate-y-4">🐨</div>
-                <div class="relative z-10">
-                    <span id="modal-subtitle" class="bg-blue-900 text-blue-100 text-xs font-extrabold uppercase tracking-widest px-3 py-1 rounded-lg mb-2 inline-block shadow-sm">Mes X • Semana Y</span>
-                    <h3 id="modal-title" class="text-2xl md:text-3xl font-extrabold text-white mt-1">Título de la Semana</h3>
-                </div>
-                <button onclick="closeModal()" class="relative z-10 text-white hover:text-blue-900 hover:bg-white bg-blue-600 rounded-full w-10 h-10 flex justify-center items-center text-xl font-bold transition shadow-md">&times;</button>
-            </div>
-            
-            <div id="modal-body" class="p-6 md:p-10 overflow-y-auto flex-1 bg-slate-50">
-                <!-- Se inyecta por JS -->
+            <div class="p-4 bg-white border-t border-slate-100 flex gap-2">
+                <input type="text" id="ai-input" placeholder="Ask a question..." class="flex-1 bg-slate-100 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-slate-300">
+                <button id="btn-ai-send" class="bg-slate-800 text-white px-6 py-2 rounded-xl font-bold hover:bg-black">Send</button>
             </div>
         </div>
     </div>
 
-    <script>
-        const weeklyData = [
-            { week: 1, month: 1, title: "Identidad y Entorno", summary: "Las bases de todo: Presentarte, deletrear y hablar del entorno de la congregación sin miedo.", grammar: ["Verbo 'To Be' (Am/Is/Are). Afirmación, negación y preguntas.", "Pronombres y Posesivos (my, your, his, her).", "Artículos (A/An/The) y Demostrativos (This/That)."], phonetics: "El Alfabeto. Contraste: /ɪ/ vs /iː/ (live/leave, ship/sheep).", vocabGen: "Saludos, Números, Países, Profesiones.", vocabTeo: "Brother, Sister, Congregation, Kingdom Hall, Meeting.", selfStudy: "Abre JW.org en inglés. Ve a 'Meetings'. Escucha la canción 1 leyendo la letra para ver la pronunciación de los saludos.", classes: [{ num: 1, focus: "Greetings & To Be. Presentaciones alegres y dinámicas." }, { num: 2, focus: "Posesivos, Demostrativos y Deletreo (Alfabeto)." }, { num: 3, focus: "Role-play: Recibiendo a un visitante en el Salón del Reino." }] },
-            { week: 2, month: 1, title: "Rutinas Personales", summary: "Aprenderemos a describir el día a día y tu horario de predicación.", grammar: ["Presente Simple (I, You, We, They). Auxiliar Do/Don't.", "Adverbios de Frecuencia (Always, Usually, Never).", "Preposiciones de Tiempo básicas (In, On, At)."], phonetics: "Ritmo de la oración (Sentence Rhythm). Evitar hablar plano.", vocabGen: "Rutinas, Días, Decir la hora.", vocabTeo: "Preaching work, Field service, Personal study, Ministry.", selfStudy: "Escribe tu rutina espiritual semanal completa en inglés en tu cuaderno.", classes: [{ num: 1, focus: "Verbos de rutina y decir la hora. Armar la agenda." }, { num: 2, focus: "Adverbios de frecuencia. Preguntas: 'How often do you...?'" }, { num: 3, focus: "Speaking: Describir tu rutina secular y ministerial diaria." }] },
-            { week: 3, month: 1, title: "Tercera Persona", summary: "Hablar sobre otros (Él, Ella). Dominaremos la regla de la 'S'.", grammar: ["Presente Simple para He/She/It. Auxiliares Does / Doesn't.", "Reglas ortográficas: -s, -es, -ies.", "Question words (Who, What, Where, When)."], phonetics: "Terminación de la 3ra persona: /s/ (works), /z/ (plays), /ɪz/ (watches).", vocabGen: "Familia extendida, Descripción física básica.", vocabTeo: "Elder, Pioneer, Circuit Overseer, Ministerial Servant.", selfStudy: "Lee la biografía de alguien en La Atalaya. Subraya los verbos con 'S' al final.", classes: [{ num: 1, focus: "Reglas de afirmación (He/She). Describir a otra persona." }, { num: 2, focus: "Drill fonético intensivo (/s/ /z/ /ɪz/) con Does/Doesn't." }, { num: 3, focus: "Role-play: Entrevista describiendo la semana de un Anciano." }] },
-            { week: 4, month: 1, title: "Acciones en Curso", summary: "Describiremos lo que está sucediendo en este preciso momento.", grammar: ["Presente Continuo (To Be + Verbo-ing).", "Contraste: Simple (Rutina) vs Continuo (Ahora).", "Verbos de estado (know, like, want)."], phonetics: "El sonido Nasal /ŋ/ (doing, walking). No pronunciar la 'G' fuerte final.", vocabGen: "Ropa, Clima, Actividades domésticas.", vocabTeo: "Cart witnessing, giving a comment, singing, reading.", selfStudy: "Mira fotos en JW.org. Escribe 3 oraciones diciendo qué están haciendo AHORA.", classes: [{ num: 1, focus: "Estructura del Continuo. Juego de mímica." }, { num: 2, focus: "Contraste Simple vs Continuo. (Usually vs Today)." }, { num: 3, focus: "Descripción de ilustraciones del paraíso o predicación." }] },
-            { week: 5, month: 2, title: "Gustos e Invitaciones", summary: "Expresar qué amamos hacer y aprender a invitar a otros cortésmente.", grammar: ["Verbos de preferencia + Gerundio (-ing) o Infinitivo.", "Preguntas formales: 'Would you like...?'", "Contables e Incontables (Some/Any)."], phonetics: "Contraste de labios: /v/ vs /b/ (very/berry).", vocabGen: "Hobbies, Comida, Géneros de películas.", vocabTeo: "Singing kingdom songs, broadcasting, hospitality.", selfStudy: "Investiga cómo invitar a la Conmemoración en el folleto en JW Library.", classes: [{ num: 1, focus: "Like/Love + ing. Entrevista de pasatiempos." }, { num: 2, focus: "Fonética /v/ vs /b/. Invitar comida (Would you like some...?)." }, { num: 3, focus: "Role-play: Invitando a un compañero al Salón." }] },
-            { week: 6, month: 2, title: "Narrativa: El Pasado", summary: "Comenzamos a contar historias. Hablaremos de eventos terminados.", grammar: ["Pasado del 'To Be' (Was/Were).", "Pasado Simple Regulares (-ed).", "Expresiones de tiempo (yesterday, last year)."], phonetics: "Las 3 terminaciones -ed: /t/ (worked), /d/ (played), /ɪd/ (visited).", vocabGen: "Adjetivos de ánimo, Fechas exactas.", vocabTeo: "Convention, Assembly, Memorial, Baptism.", selfStudy: "Busca en YouGlish 5 verbos regulares para escuchar su pronunciación.", classes: [{ num: 1, focus: "Was / Were. Describir dónde estabas en el pasado." }, { num: 2, focus: "Reglas del -ed. Entrenamiento auditivo intensivo." }, { num: 3, focus: "Storytelling: '¿Cómo estuvo la última asamblea?'" }] },
-            { week: 7, month: 2, title: "Pasado (Irregulares)", summary: "Narrar historias complejas sin pausas, usando verbos irregulares clave.", grammar: ["Top 40 Verbos Irregulares del Pasado Simple.", "Auxiliar Did / Didn't para preguntas.", "Conectores (First, then, finally)."], phonetics: "El sonido Schwa /ə/ (sílabas relajadas: a-bout).", vocabGen: "Viajes, Experiencias de vida.", vocabTeo: "Learning the truth, praying, preaching door-to-door.", selfStudy: "Prepara tu 'Experiencia' en tu cuaderno usando conectores.", classes: [{ num: 1, focus: "Memorización de los top 20 verbos irregulares." }, { num: 2, focus: "Preguntas con Did. Juego estilo periodista." }, { num: 3, focus: "Fluidez: Contar tu experiencia o cómo conociste la verdad." }] },
-            { week: 8, month: 2, title: "Lugares y Direcciones", summary: "Dar instrucciones claras, ubicar lugares y describir espacios.", grammar: ["Preposiciones de Lugar.", "Imperativos (Go straight).", "There is / There are."], phonetics: "Sonidos con la lengua en los dientes: /θ/ vs /ð/.", vocabGen: "Lugares de ciudad, Muebles, Direcciones.", vocabTeo: "Territory, Return visit, Map, Podium.", selfStudy: "Dibuja un mapa y escribe cómo llegar al Salón en inglés.", classes: [{ num: 1, focus: "There is/are. Describir habitaciones y el Salón." }, { num: 2, focus: "Dar direcciones. Ejercicios con espejo para /θ/ y /ð/." }, { num: 3, focus: "Role-play: Guiando a un hermano en la calle." }] },
-            { week: 9, month: 3, title: "Obligaciones y Consejos", summary: "Aprender a expresar deberes y dar sugerencias bíblicas con tacto.", grammar: ["Modales de Obligación: Must vs Have to.", "Modales de Consejo: Should / Shouldn't.", "Infinitivos de propósito."], phonetics: "Formas débiles (Weak forms): shoul-da, hav-ta.", vocabGen: "Reglas, Salud, Tareas del hogar.", vocabTeo: "Bible principles, Moral standards, Encouragement.", selfStudy: "Busca un artículo para familias en JW.org. Identifica el uso de 'Should'.", classes: [{ num: 1, focus: "Must vs Have to. (Reglas internas vs externas)." }, { num: 2, focus: "Should/Shouldn't. Práctica de formas débiles." }, { num: 3, focus: "Role-play: Dando consejo bíblico (Should)." }] },
-            { week: 10, month: 3, title: "Planes y Proyectos", summary: "Hablaremos de intenciones, agendas y metas espirituales a futuro.", grammar: ["Futuro con 'Be going to'.", "Presente Continuo con valor de futuro."], phonetics: "Reducción informal: 'Going to' se vuelve 'Gonna'.", vocabGen: "Expresiones futuras, Viajes, Agendas.", vocabTeo: "Spiritual goals, Bethel, Pioneer school.", selfStudy: "Escribe tus metas espirituales a corto plazo usando 'Going to'.", classes: [{ num: 1, focus: "Going to vs Continuo. (Planes vs Agenda)." }, { num: 2, focus: "Fonética: Práctica de 'Gonna' para fluidez." }, { num: 3, focus: "Presentación: 'Mis metas espirituales'." }] },
-            { week: 11, month: 3, title: "Promesas y Condiciones", summary: "Describir el Paraíso, decisiones espontáneas y promesas.", grammar: ["Futuro con 'Will / Won't'.", "Will vs Going to.", "Primer Condicional (If + Presente, Will)."], phonetics: "Contracciones con Will (I'll, you'll). La 'L' oscura.", vocabGen: "Medio ambiente, Promesas cotidianas.", vocabTeo: "Paradise, Kingdom blessings, Resurrection hope.", selfStudy: "Lee las promesas de 'Enjoy Life Forever' e identifica 'Will'.", classes: [{ num: 1, focus: "Will vs Going to. Decisiones rápidas." }, { num: 2, focus: "Contracciones (I'll) + Primer Condicional." }, { num: 3, focus: "Ministerio: Leer Rev 21:4 y explicar promesas con Will." }] },
-            { week: 12, month: 3, title: "Comparaciones y Fluidez", summary: "Dar opiniones estructuradas, comparar cosas y la evaluación final.", grammar: ["Comparativos (-er) y Superlativos (-est).", "Revisión de todos los tiempos.", "Frases de opinión."], phonetics: "Acento de palabra en adjetivos largos.", vocabGen: "Adjetivos de personalidad.", vocabTeo: "Faithful, Loyal, Loving, Endurance.", selfStudy: "Grábate respondiendo: 'Why is learning English important?'", classes: [{ num: 1, focus: "Comparativos/Superlativos." }, { num: 2, focus: "Silla Caliente: Responder mezclando tiempos." }, { num: 3, focus: "EVALUACIÓN: Entrevista y presentación (10 min)." }] }
-        ];
-
-        // GLOSARIO MASIVO (50 POR CATEGORÍA = 200 PALABRAS)
-        const vocabData = [
-            // TEOCRÁTICO (50)
-            { term: "Elder", cat: "Teocrático", eng: "Anciano", example: "The elders provide spiritual help." },
-            { term: "Pioneer", cat: "Teocrático", eng: "Precursor(a)", example: "She serves as a regular pioneer." },
-            { term: "Publisher", cat: "Teocrático", eng: "Publicador", example: "He is an unbaptized publisher." },
-            { term: "Congregation", cat: "Teocrático", eng: "Congregación", example: "Our congregation has 100 members." },
-            { term: "Kingdom Hall", cat: "Teocrático", eng: "Salón del Reino", example: "We clean the Kingdom Hall." },
-            { term: "Meeting", cat: "Teocrático", eng: "Reunión", example: "The meeting starts at 7 PM." },
-            { term: "Memorial", cat: "Teocrático", eng: "Conmemoración", example: "We invite you to the Memorial." },
-            { term: "Assembly", cat: "Teocrático", eng: "Asamblea (Circuito)", example: "The circuit assembly is next month." },
-            { term: "Convention", cat: "Teocrático", eng: "Asamblea (Regional)", example: "I love the regional convention." },
-            { term: "Preaching work", cat: "Teocrático", eng: "Obra de predicación", example: "We share in the preaching work." },
-            { term: "Ministry", cat: "Teocrático", eng: "Ministerio", example: "Paul loved his ministry." },
-            { term: "Bible study", cat: "Teocrático", eng: "Estudio Bíblico", example: "I conduct a Bible study." },
-            { term: "Return visit", cat: "Teocrático", eng: "Revisita", example: "I have a return visit today." },
-            { term: "Cart witnessing", cat: "Teocrático", eng: "Predicación pública", example: "Cart witnessing is effective." },
-            { term: "House-to-house", cat: "Teocrático", eng: "De casa en casa", example: "We preach house-to-house." },
-            { term: "Tract", cat: "Teocrático", eng: "Tratado", example: "Would you like to read this tract?" },
-            { term: "Brochure", cat: "Teocrático", eng: "Folleto", example: "This brochure answers your question." },
-            { term: "Magazine", cat: "Teocrático", eng: "Revista", example: "I brought you a new magazine." },
-            { term: "Watchtower", cat: "Teocrático", eng: "La Atalaya", example: "We study the Watchtower on weekends." },
-            { term: "Awake!", cat: "Teocrático", eng: "¡Despertad!", example: "The Awake! magazine is very interesting." },
-            { term: "Prayer", cat: "Teocrático", eng: "Oración", example: "Prayer gives us comfort." },
-            { term: "Faith", cat: "Teocrático", eng: "Fe", example: "We need strong faith." },
-            { term: "Hope", cat: "Teocrático", eng: "Esperanza", example: "Our hope is real." },
-            { term: "Love", cat: "Teocrático", eng: "Amor", example: "God is love." },
-            { term: "Paradise", cat: "Teocrático", eng: "Paraíso", example: "The earth will be a paradise." },
-            { term: "Kingdom", cat: "Teocrático", eng: "Reino", example: "God's Kingdom will rule the earth." },
-            { term: "Jehovah", cat: "Teocrático", eng: "Jehová", example: "Jehovah is the true God." },
-            { term: "Jesus Christ", cat: "Teocrático", eng: "Jesucristo", example: "Jesus Christ is our King." },
-            { term: "Anointed", cat: "Teocrático", eng: "Ungido", example: "The anointed will rule in heaven." },
-            { term: "Great Tribulation", cat: "Teocrático", eng: "Gran Tribulación", example: "The Great Tribulation is coming." },
-            { term: "Armageddon", cat: "Teocrático", eng: "Armagedón", example: "Armageddon is God's war." },
-            { term: "Resurrection", cat: "Teocrático", eng: "Resurrección", example: "I believe in the resurrection." },
-            { term: "Scripture", cat: "Teocrático", eng: "Escritura (Texto)", example: "Read this scripture." },
-            { term: "Verse", cat: "Teocrático", eng: "Versículo", example: "Look at verse 5." },
-            { term: "Chapter", cat: "Teocrático", eng: "Capítulo", example: "Open chapter 3." },
-            { term: "Book", cat: "Teocrático", eng: "Libro", example: "The book of Genesis." },
-            { term: "Songbook", cat: "Teocrático", eng: "Cancionero", example: "Open your songbook to song 10." },
-            { term: "Broadcasting", cat: "Teocrático", eng: "Broadcasting (TV)", example: "We watch the monthly broadcasting." },
-            { term: "Governing Body", cat: "Teocrático", eng: "Cuerpo Gobernante", example: "The Governing Body directs the work." },
-            { term: "Circuit Overseer", cat: "Teocrático", eng: "Superintendente de Circuito", example: "The circuit overseer is visiting us." },
-            { term: "Ministerial Servant", cat: "Teocrático", eng: "Siervo Ministerial", example: "He is a ministerial servant." },
-            { term: "Shepherd", cat: "Teocrático", eng: "Pastor (Espiritual)", example: "Elders are spiritual shepherds." },
-            { term: "Dedication", cat: "Teocrático", eng: "Dedicación", example: "Dedication is a personal promise." },
-            { term: "Baptism", cat: "Teocrático", eng: "Bautismo", example: "His baptism was very touching." },
-            { term: "Disfellowship", cat: "Teocrático", eng: "Expulsar", example: "The action to disfellowship is out of love." },
-            { term: "Repentance", cat: "Teocrático", eng: "Arrepentimiento", example: "Repentance is necessary." },
-            { term: "Forgiveness", cat: "Teocrático", eng: "Perdón", example: "Jehovah's forgiveness is great." },
-            { term: "Spiritual", cat: "Teocrático", eng: "Espiritual", example: "We have spiritual goals." },
-            { term: "Worldly", cat: "Teocrático", eng: "Mundano", example: "Avoid bad worldly habits." },
-            { term: "Truth", cat: "Teocrático", eng: "Verdad", example: "We must live in the truth." },
-
-            // HÁBITOS (50)
-            { term: "Wake up", cat: "Hábitos", eng: "Despertarse", example: "I wake up at 6 AM." },
-            { term: "Get up", cat: "Hábitos", eng: "Levantarse", example: "I get up 10 minutes later." },
-            { term: "Take a shower", cat: "Hábitos", eng: "Bañarse", example: "I take a shower every morning." },
-            { term: "Brush teeth", cat: "Hábitos", eng: "Cepillarse", example: "Don't forget to brush your teeth." },
-            { term: "Comb hair", cat: "Hábitos", eng: "Peinarse", example: "I comb my hair quickly." },
-            { term: "Get dressed", cat: "Hábitos", eng: "Vestirse", example: "I get dressed for work." },
-            { term: "Put on makeup", cat: "Hábitos", eng: "Maquillarse", example: "She puts on makeup." },
-            { term: "Shave", cat: "Hábitos", eng: "Afeitarse", example: "He shaves his beard." },
-            { term: "Make breakfast", cat: "Hábitos", eng: "Hacer el desayuno", example: "I make breakfast for my family." },
-            { term: "Have breakfast", cat: "Hábitos", eng: "Desayunar", example: "We have breakfast together." },
-            { term: "Drink coffee", cat: "Hábitos", eng: "Tomar café", example: "I drink coffee to wake up." },
-            { term: "Leave home", cat: "Hábitos", eng: "Salir de casa", example: "I leave home at 7:30." },
-            { term: "Lock the door", cat: "Hábitos", eng: "Echar llave", example: "Always lock the door." },
-            { term: "Commute", cat: "Hábitos", eng: "Viajar al trabajo/estudio", example: "My commute is long." },
-            { term: "Take the bus", cat: "Hábitos", eng: "Tomar el bus", example: "I take the bus downtown." },
-            { term: "Drive to work", cat: "Hábitos", eng: "Manejar al trabajo", example: "I drive to work every day." },
-            { term: "Arrive at work", cat: "Hábitos", eng: "Llegar al trabajo", example: "I arrive at work early." },
-            { term: "Start working", cat: "Hábitos", eng: "Empezar a trabajar", example: "We start working at 8 AM." },
-            { term: "Check emails", cat: "Hábitos", eng: "Revisar correos", example: "First, I check my emails." },
-            { term: "Have lunch", cat: "Hábitos", eng: "Almorzar", example: "I have lunch at noon." },
-            { term: "Take a break", cat: "Hábitos", eng: "Tomar un descanso", example: "Let's take a 15-minute break." },
-            { term: "Finish work", cat: "Hábitos", eng: "Terminar de trabajar", example: "I finish work at 5 PM." },
-            { term: "Go home", cat: "Hábitos", eng: "Ir a casa", example: "I go home and relax." },
-            { term: "Buy groceries", cat: "Hábitos", eng: "Comprar comida", example: "I buy groceries on Fridays." },
-            { term: "Cook dinner", cat: "Hábitos", eng: "Cocinar la cena", example: "I love to cook dinner." },
-            { term: "Have dinner", cat: "Hábitos", eng: "Cenar", example: "We have dinner at 8 PM." },
-            { term: "Wash the dishes", cat: "Hábitos", eng: "Lavar platos", example: "Please wash the dishes." },
-            { term: "Watch TV", cat: "Hábitos", eng: "Ver televisión", example: "I watch TV for an hour." },
-            { term: "Read a book", cat: "Hábitos", eng: "Leer un libro", example: "I read a book before bed." },
-            { term: "Listen to music", cat: "Hábitos", eng: "Escuchar música", example: "I listen to music while cleaning." },
-            { term: "Check social media", cat: "Hábitos", eng: "Revisar redes sociales", example: "I check social media on my phone." },
-            { term: "Call a friend", cat: "Hábitos", eng: "Llamar a un amigo", example: "I call a friend on weekends." },
-            { term: "Do the laundry", cat: "Hábitos", eng: "Lavar ropa", example: "I do the laundry on Sunday." },
-            { term: "Iron clothes", cat: "Hábitos", eng: "Planchar ropa", example: "I hate to iron clothes." },
-            { term: "Sweep the floor", cat: "Hábitos", eng: "Barrer", example: "I sweep the floor every day." },
-            { term: "Mop the floor", cat: "Hábitos", eng: "Trapear", example: "I mop the floor twice a week." },
-            { term: "Take out the trash", cat: "Hábitos", eng: "Sacar la basura", example: "Take out the trash, please." },
-            { term: "Feed the pet", cat: "Hábitos", eng: "Alimentar mascota", example: "I feed the dog." },
-            { term: "Water the plants", cat: "Hábitos", eng: "Regar las plantas", example: "Don't forget to water the plants." },
-            { term: "Go for a walk", cat: "Hábitos", eng: "Salir a caminar", example: "I go for a walk in the evening." },
-            { term: "Exercise", cat: "Hábitos", eng: "Hacer ejercicio", example: "I exercise three times a week." },
-            { term: "Take a nap", cat: "Hábitos", eng: "Tomar una siesta", example: "I take a nap on Sundays." },
-            { term: "Set the alarm", cat: "Hábitos", eng: "Poner la alarma", example: "I set the alarm for 6 AM." },
-            { term: "Go to bed", cat: "Hábitos", eng: "Acostarse", example: "I go to bed at 10 PM." },
-            { term: "Fall asleep", cat: "Hábitos", eng: "Quedarse dormido", example: "I fall asleep quickly." },
-            { term: "Pray", cat: "Hábitos", eng: "Orar", example: "I pray before sleeping." },
-            { term: "Study", cat: "Hábitos", eng: "Estudiar", example: "I study English every day." },
-            { term: "Meditate", cat: "Hábitos", eng: "Meditar", example: "I meditate on Bible principles." },
-            { term: "Relax", cat: "Hábitos", eng: "Relajarse", example: "It's time to relax." },
-            { term: "Plan the day", cat: "Hábitos", eng: "Planear el día", example: "I plan the day in the morning." },
-
-            // VERBOS (50)
-            { term: "Be", cat: "Verbos", eng: "Ser / Estar", example: "I am happy to be here." },
-            { term: "Have", cat: "Verbos", eng: "Tener", example: "I have a lot of time." },
-            { term: "Do", cat: "Verbos", eng: "Hacer (Acción)", example: "I do my best." },
-            { term: "Make", cat: "Verbos", eng: "Hacer (Fabricar)", example: "I make good coffee." },
-            { term: "Go", cat: "Verbos", eng: "Ir", example: "We go to the park." },
-            { term: "Come", cat: "Verbos", eng: "Venir", example: "Come with me." },
-            { term: "Take", cat: "Verbos", eng: "Tomar", example: "Take this book." },
-            { term: "Give", cat: "Verbos", eng: "Dar", example: "Give me a minute." },
-            { term: "Get", cat: "Verbos", eng: "Obtener / Conseguir", example: "I get a new job." },
-            { term: "Find", cat: "Verbos", eng: "Encontrar", example: "I can't find my keys." },
-            { term: "Think", cat: "Verbos", eng: "Pensar", example: "I think it is a good idea." },
-            { term: "Look", cat: "Verbos", eng: "Mirar", example: "Look at the sky." },
-            { term: "See", cat: "Verbos", eng: "Ver", example: "I see a bird." },
-            { term: "Use", cat: "Verbos", eng: "Usar", example: "I use my phone." },
-            { term: "Tell", cat: "Verbos", eng: "Decir (a alguien)", example: "Tell me the truth." },
-            { term: "Ask", cat: "Verbos", eng: "Preguntar / Pedir", example: "Ask a question." },
-            { term: "Work", cat: "Verbos", eng: "Trabajar", example: "I work every day." },
-            { term: "Seem", cat: "Verbos", eng: "Parecer", example: "It seems difficult." },
-            { term: "Feel", cat: "Verbos", eng: "Sentir", example: "I feel good." },
-            { term: "Try", cat: "Verbos", eng: "Intentar", example: "Try to do it." },
-            { term: "Leave", cat: "Verbos", eng: "Dejar / Irse", example: "Leave it here." },
-            { term: "Call", cat: "Verbos", eng: "Llamar", example: "Call your mother." },
-            { term: "Need", cat: "Verbos", eng: "Necesitar", example: "I need some water." },
-            { term: "Want", cat: "Verbos", eng: "Querer", example: "I want to learn." },
-            { term: "Mean", cat: "Verbos", eng: "Significar", example: "What does this mean?" },
-            { term: "Keep", cat: "Verbos", eng: "Mantener / Guardar", example: "Keep the secret." },
-            { term: "Let", cat: "Verbos", eng: "Permitir / Dejar", example: "Let me go." },
-            { term: "Begin", cat: "Verbos", eng: "Empezar", example: "We begin now." },
-            { term: "Start", cat: "Verbos", eng: "Comenzar", example: "Start the car." },
-            { term: "Help", cat: "Verbos", eng: "Ayudar", example: "Please help me." },
-            { term: "Talk", cat: "Verbos", eng: "Hablar (Conversar)", example: "Let's talk about it." },
-            { term: "Turn", cat: "Verbos", eng: "Girar / Voltear", example: "Turn left here." },
-            { term: "Show", cat: "Verbos", eng: "Mostrar", example: "Show me the picture." },
-            { term: "Hear", cat: "Verbos", eng: "Oír", example: "Did you hear that?" },
-            { term: "Play", cat: "Verbos", eng: "Jugar / Tocar", example: "I play the piano." },
-            { term: "Run", cat: "Verbos", eng: "Correr", example: "I run fast." },
-            { term: "Move", cat: "Verbos", eng: "Mover / Mudarse", example: "Move the table." },
-            { term: "Like", cat: "Verbos", eng: "Gustar", example: "I like chocolate." },
-            { term: "Live", cat: "Verbos", eng: "Vivir", example: "I live in the city." },
-            { term: "Believe", cat: "Verbos", eng: "Creer", example: "I believe you." },
-            { term: "Hold", cat: "Verbos", eng: "Sostener", example: "Hold my hand." },
-            { term: "Bring", cat: "Verbos", eng: "Traer", example: "Bring some food." },
-            { term: "Happen", cat: "Verbos", eng: "Suceder", example: "What happened?" },
-            { term: "Write", cat: "Verbos", eng: "Escribir", example: "Write a letter." },
-            { term: "Provide", cat: "Verbos", eng: "Proveer", example: "They provide help." },
-            { term: "Sit", cat: "Verbos", eng: "Sentarse", example: "Sit down." },
-            { term: "Stand", cat: "Verbos", eng: "Pararse", example: "Stand up." },
-            { term: "Lose", cat: "Verbos", eng: "Perder", example: "Don't lose it." },
-            { term: "Pay", cat: "Verbos", eng: "Pagar", example: "I will pay the bill." },
-            { term: "Meet", cat: "Verbos", eng: "Conocer / Reunirse", example: "Nice to meet you." },
-
-            // LUGARES (50)
-            { term: "Grocery store", cat: "Lugares", eng: "Tienda de alimentos", example: "I buy milk at the grocery store." },
-            { term: "Supermarket", cat: "Lugares", eng: "Supermercado", example: "The supermarket is big." },
-            { term: "Pharmacy", cat: "Lugares", eng: "Farmacia", example: "I need medicine from the pharmacy." },
-            { term: "Bakery", cat: "Lugares", eng: "Panadería", example: "The bakery smells like fresh bread." },
-            { term: "Butcher shop", cat: "Lugares", eng: "Carnicería", example: "Buy meat at the butcher shop." },
-            { term: "Cafe", cat: "Lugares", eng: "Cafetería", example: "Let's drink espresso at the cafe." },
-            { term: "Restaurant", cat: "Lugares", eng: "Restaurante", example: "This restaurant has good food." },
-            { term: "Bank", cat: "Lugares", eng: "Banco", example: "I need to go to the bank." },
-            { term: "Post office", cat: "Lugares", eng: "Oficina de correos", example: "Send the letter at the post office." },
-            { term: "Hospital", cat: "Lugares", eng: "Hospital", example: "The hospital is open 24/7." },
-            { term: "Clinic", cat: "Lugares", eng: "Clínica", example: "She went to the dental clinic." },
-            { term: "Police station", cat: "Lugares", eng: "Estación de policía", example: "The police station is nearby." },
-            { term: "Fire station", cat: "Lugares", eng: "Estación de bomberos", example: "The fire station is on Main Street." },
-            { term: "School", cat: "Lugares", eng: "Escuela", example: "Children learn at school." },
-            { term: "University", cat: "Lugares", eng: "Universidad", example: "He studies at the university." },
-            { term: "Library", cat: "Lugares", eng: "Biblioteca", example: "Be quiet in the library." },
-            { term: "Bookstore", cat: "Lugares", eng: "Librería", example: "I bought a novel at the bookstore." },
-            { term: "Museum", cat: "Lugares", eng: "Museo", example: "The museum has old paintings." },
-            { term: "Theater", cat: "Lugares", eng: "Teatro", example: "We watched a play at the theater." },
-            { term: "Cinema", cat: "Lugares", eng: "Cine", example: "Let's watch a movie at the cinema." },
-            { term: "Park", cat: "Lugares", eng: "Parque", example: "The park has many trees." },
-            { term: "Square", cat: "Lugares", eng: "Plaza", example: "The town square is beautiful." },
-            { term: "Stadium", cat: "Lugares", eng: "Estadio", example: "The soccer game is at the stadium." },
-            { term: "Gym", cat: "Lugares", eng: "Gimnasio", example: "I exercise at the gym." },
-            { term: "Mall", cat: "Lugares", eng: "Centro comercial", example: "We went shopping at the mall." },
-            { term: "Clothing store", cat: "Lugares", eng: "Tienda de ropa", example: "I bought a shirt at the clothing store." },
-            { term: "Shoe store", cat: "Lugares", eng: "Zapatería", example: "The shoe store has a sale." },
-            { term: "Hardware store", cat: "Lugares", eng: "Ferretería", example: "Buy tools at the hardware store." },
-            { term: "Hair salon", cat: "Lugares", eng: "Peluquería", example: "She got a haircut at the hair salon." },
-            { term: "Barbershop", cat: "Lugares", eng: "Barbería", example: "He went to the barbershop." },
-            { term: "Airport", cat: "Lugares", eng: "Aeropuerto", example: "Our flight leaves from the airport." },
-            { term: "Train station", cat: "Lugares", eng: "Estación de tren", example: "The train arrives at the station." },
-            { term: "Bus station", cat: "Lugares", eng: "Estación de autobuses", example: "We wait at the bus station." },
-            { term: "Subway station", cat: "Lugares", eng: "Estación de metro", example: "The subway station is underground." },
-            { term: "Gas station", cat: "Lugares", eng: "Gasolinera", example: "We need fuel from the gas station." },
-            { term: "Parking lot", cat: "Lugares", eng: "Estacionamiento", example: "Park the car in the parking lot." },
-            { term: "Hotel", cat: "Lugares", eng: "Hotel", example: "We stayed at a nice hotel." },
-            { term: "Church", cat: "Lugares", eng: "Iglesia", example: "The church has a tall tower." },
-            { term: "Factory", cat: "Lugares", eng: "Fábrica", example: "He works in a car factory." },
-            { term: "Office building", cat: "Lugares", eng: "Edificio de oficinas", example: "Her company is in that office building." },
-            { term: "Downtown", cat: "Lugares", eng: "Centro de la ciudad", example: "Downtown is very busy." },
-            { term: "Neighborhood", cat: "Lugares", eng: "Barrio", example: "My neighborhood is safe." },
-            { term: "Suburb", cat: "Lugares", eng: "Suburbio", example: "They live in a quiet suburb." },
-            { term: "Street", cat: "Lugares", eng: "Calle", example: "Walk down this street." },
-            { term: "Avenue", cat: "Lugares", eng: "Avenida", example: "The shop is on 5th Avenue." },
-            { term: "Boulevard", cat: "Lugares", eng: "Bulevar", example: "Drive along the boulevard." },
-            { term: "Corner", cat: "Lugares", eng: "Esquina", example: "The bank is on the corner." },
-            { term: "Intersection", cat: "Lugares", eng: "Intersección / Cruce", example: "Stop at the intersection." },
-            { term: "Crosswalk", cat: "Lugares", eng: "Paso de peatones", example: "Use the crosswalk to cross the street." },
-            { term: "Highway", cat: "Lugares", eng: "Autopista", example: "The highway goes to the next city." }
-        ];
-
-        let radarChartInstance = null;
-
-        function navigate(viewId) {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(viewId).classList.add('active');
-            document.getElementById('nav-' + viewId).classList.add('active');
-            
-            if(viewId === 'inicio' && !radarChartInstance) initRadarChart();
-            if(viewId === 'recursos') openGlossaryTab('Todos'); 
-        }
-
-        function filterMonths(monthNum) {
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active', 'bg-white', 'shadow-sm', 'border-slate-200', 'border-t-2', 'border-l-2', 'border-r-2'));
-            const activeTab = document.getElementById('tab-month-' + monthNum);
-            activeTab.classList.add('active', 'bg-white', 'border-slate-200', 'border-t-2', 'border-l-2', 'border-r-2');
-            
-            const grid = document.getElementById('weeks-grid');
-            grid.innerHTML = '';
-            const filteredWeeks = weeklyData.filter(w => w.month === monthNum);
-            
-            filteredWeeks.forEach(week => {
-                const card = document.createElement('div');
-                card.className = "week-card bg-white rounded-2xl p-6 border border-slate-200 flex flex-col h-full";
-                card.onclick = () => openWeekDetails(week.week);
-                
-                card.innerHTML = `
-                    <div class="mb-3">
-                        <span class="text-xs font-extrabold text-blue-700 uppercase tracking-widest bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-lg">Semana ${week.week}</span>
-                    </div>
-                    <h4 class="font-extrabold text-blue-900 text-xl mb-3">${week.title}</h4>
-                    <p class="text-sm text-slate-600 mb-6 font-medium">${week.summary}</p>
-                    <div class="mt-auto pt-4 border-t border-slate-100 flex justify-between items-center text-emerald-600 text-sm font-bold">
-                        <span>Ver Temario Completo</span>
-                        <span class="text-lg">→</span>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function openWeekDetails(weekNumber) {
-            const data = weeklyData.find(w => w.week === weekNumber);
-            if(!data) return;
-
-            document.getElementById('modal-subtitle').textContent = `Mes ${data.month} • Semana ${data.week}`;
-            document.getElementById('modal-title').textContent = data.title;
-
-            const grammarHTML = data.grammar.map(g => `<li class="flex items-start mb-3"><span class="text-blue-500 mr-3 text-lg mt-0.5">🔹</span> <span class="text-slate-700 font-medium text-base">${g}</span></li>`).join('');
-            const classesHTML = data.classes.map(c => `
-                <div class="bg-white p-5 border border-slate-200 rounded-xl shadow-sm">
-                    <div class="text-xs font-extrabold text-emerald-600 uppercase tracking-widest mb-2">
-                        Día ${c.num}
-                    </div>
-                    <div class="text-slate-800 font-bold text-base leading-relaxed">${c.focus}</div>
-                </div>
-            `).join('');
-
-            const modalBody = document.getElementById('modal-body');
-            modalBody.innerHTML = `
-                <p class="text-lg text-blue-900 mb-8 font-bold border-l-8 border-emerald-400 pl-5 bg-white p-5 rounded-r-2xl shadow-sm leading-relaxed">${data.summary}</p>
-                
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                    <div class="space-y-6">
-                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                            <h4 class="text-lg font-extrabold text-blue-900 mb-5 flex items-center gap-3"><span class="text-2xl">📘</span> Reglas Gramaticales</h4>
-                            <ul>${grammarHTML}</ul>
-                        </div>
-                        <div class="bg-amber-50 p-6 rounded-2xl border border-amber-200 shadow-sm">
-                            <h4 class="text-lg font-extrabold text-amber-900 mb-3 flex items-center gap-3"><span class="text-2xl">🗣️</span> Foco Fonético</h4>
-                            <p class="text-base text-amber-950 font-bold leading-relaxed">${data.phonetics}</p>
-                        </div>
-                    </div>
-                    <div class="space-y-6">
-                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                            <h4 class="text-lg font-extrabold text-blue-900 mb-5 flex items-center gap-3"><span class="text-2xl">📚</span> Vocabulario Clave</h4>
-                            <div class="space-y-5">
-                                <div>
-                                    <span class="text-xs font-extrabold text-slate-400 uppercase tracking-widest block mb-2">Inglés Diario</span>
-                                    <p class="text-base text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-100 font-medium">${data.vocabGen}</p>
-                                </div>
-                                <div>
-                                    <span class="text-xs font-extrabold text-emerald-600 uppercase tracking-widest block mb-2">Inglés Teocrático</span>
-                                    <p class="text-base text-emerald-900 bg-emerald-50 border-2 border-emerald-100 p-3 rounded-xl font-bold">${data.vocabTeo}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-blue-800 p-6 rounded-2xl shadow-sm">
-                            <h4 class="text-base font-extrabold text-blue-200 mb-3 flex items-center gap-3"><span class="text-2xl">💡</span> Autoestudio</h4>
-                            <p class="text-base text-white font-medium leading-relaxed">${data.selfStudy}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-slate-100 p-6 rounded-2xl border border-slate-200">
-                    <h4 class="text-lg font-extrabold text-blue-900 mb-5 flex items-center gap-3"><span class="text-2xl">📅</span> Plan de Clases</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                        ${classesHTML}
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('week-modal').classList.add('active');
-        }
-
-        function closeModal() {
-            document.getElementById('week-modal').classList.remove('active');
-        }
-
-        document.getElementById('week-modal').addEventListener('click', function(e) {
-            if (e.target === this) closeModal();
-        });
-
-        let currentVocabCategory = 'Todos';
-        const categoryInfo = {
-            'Todos': { title: 'Todos los términos', icon: '🔍' },
-            'Hábitos': { title: 'Hábitos y Vida Diaria', icon: '☕' },
-            'Teocrático': { title: 'Inglés Teocrático (JW)', icon: '🕊️' },
-            'Verbos': { title: 'Verbos de Acción Clave', icon: '🏃‍♀️' },
-            'Lugares': { title: 'Lugares y Ciudad', icon: '🏙️' }
-        };
-
-        function openGlossaryTab(category) {
-            currentVocabCategory = category;
-            
-            document.querySelectorAll('.glossary-tab').forEach(btn => {
-                const isSelected = btn.id === `g-tab-${category}`;
-                if(isSelected) {
-                    btn.classList.add('bg-blue-800', 'text-white', 'shadow-md');
-                    btn.classList.remove('bg-white', 'text-blue-900', 'text-emerald-700');
-                } else {
-                    btn.classList.remove('bg-blue-800', 'text-white', 'shadow-md');
-                    btn.classList.add('bg-white');
-                    if(btn.id === 'g-tab-Teocrático') btn.classList.add('text-emerald-700');
-                    else btn.classList.add('text-blue-900');
-                }
-            });
-
-            const info = categoryInfo[category];
-            document.getElementById('glossary-dynamic-title').innerHTML = `${info.icon} Explorando: ${info.title}`;
-            document.getElementById('search-vocab').value = '';
-            renderVocab();
-        }
-
-        function handleSearch() { renderVocab(); }
-
-        function renderVocab() {
-            const grid = document.getElementById('vocab-grid');
-            const noResults = document.getElementById('no-results');
-            const searchTerm = document.getElementById('search-vocab').value.toLowerCase();
-            
-            grid.innerHTML = '';
-            
-            const filtered = vocabData.filter(v => {
-                const matchCategory = currentVocabCategory === 'Todos' ? true : v.cat === currentVocabCategory;
-                const matchSearch = v.term.toLowerCase().includes(searchTerm) || v.eng.toLowerCase().includes(searchTerm);
-                return matchCategory && matchSearch;
-            });
-
-            if(filtered.length === 0) {
-                grid.classList.add('hidden');
-                noResults.classList.remove('hidden');
-            } else {
-                grid.classList.remove('hidden');
-                noResults.classList.add('hidden');
-                
-                filtered.forEach(item => {
-                    let catColor = "text-blue-700 bg-blue-50";
-                    let markerColor = "bg-blue-400";
-                    if(item.cat === 'Teocrático') { catColor = "text-emerald-800 bg-emerald-50"; markerColor = "bg-emerald-400"; }
-                    if(item.cat === 'Verbos') { catColor = "text-amber-800 bg-amber-50"; markerColor = "bg-amber-400"; }
-                    
-                    grid.innerHTML += `
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition flex flex-col relative overflow-hidden">
-                            <div class="absolute top-0 left-0 w-1.5 h-full ${markerColor}"></div>
-                            <div class="flex flex-col ml-2">
-                                <span class="font-extrabold text-lg text-slate-800 mb-1">${item.term}</span>
-                                <span class="text-[10px] font-extrabold uppercase tracking-widest ${catColor} px-2.5 py-1 rounded w-fit mb-3">${item.cat}</span>
-                                <div class="text-sm text-blue-900 font-bold mb-3 pb-3 border-b-2 border-slate-50">= ${item.eng}</div>
-                                <div class="text-sm text-slate-600 italic font-medium bg-slate-50 p-2 rounded-lg">"${item.example}"</div>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-        }
-
-        function initRadarChart() {
-            const ctx = document.getElementById('progressRadarChart').getContext('2d');
-            radarChartInstance = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: ['Fluidez', 'Gramática', 'Acento', 'Vocab. Diario', 'Vocab. JW', 'Autoestudio'],
-                    datasets: [
-                        { label: 'Hoy', data: [25, 35, 20, 30, 25, 10], fill: true, backgroundColor: 'rgba(148, 163, 184, 0.3)', borderColor: 'rgb(148, 163, 184)', pointBackgroundColor: 'rgb(148, 163, 184)', borderWidth: 2 },
-                        { label: 'Mes 3', data: [85, 80, 80, 85, 95, 85], fill: true, backgroundColor: 'rgba(16, 185, 129, 0.25)', borderColor: 'rgb(16, 185, 129)', pointBackgroundColor: 'rgb(16, 185, 129)', borderWidth: 3 }
+<script>
+/**
+ * 🎓 MASSIVE CURRICULUM DATA: Your Koala space
+ * Extended modules for A1, A2, and heavily expanded B1.
+ */
+const DATA = {
+    A1: {
+        color: 'from-blue-500 to-cyan-500', theme: 'blue',
+        mods: [
+            {
+                id: 'A1_M1', title: 'Daily Actions & Survival',
+                subs: ['Sentence structure (S+V+O)', 'Basic verbs', 'Imperatives', 'Subject pronouns', 'Object basics'],
+                th: {
+                    intro: "Para hablar inglés real desde el primer segundo, ¡olvídate del verbo 'To be' por ahora! Necesitas ACCIONES. En inglés, la regla de oro es el orden: Siempre decimos QUIÉN hace algo, luego la ACCIÓN, y finalmente QUÉ.",
+                    f: "Subject + Verb + Object",
+                    blocks: [
+                        { t: "1. The Golden Rule", d: "El orden es estricto: I (Sujeto) + eat (Verbo) + pizza (Objeto)." },
+                        { t: "2. Subject Pronouns", d: "El inglés SIEMPRE exige un sujeto. Debes decir: I, You, We, o They." },
+                        { t: "3. Imperatives", d: "Si quieres dar una orden o instrucción, es el ÚNICO momento donde quitas el sujeto. Ejemplo: 'Sit down!'" }
+                    ],
+                    ex: [
+                        ["I work every day", "Trabajo todos los días"], ["You study English", "Estudias inglés"],
+                        ["We drink coffee", "Bebemos café"], ["They play soccer", "Ellos juegan fútbol"],
+                        ["I live in Colombia", "Vivo en Colombia"], ["You speak fast", "Hablas rápido"],
+                        ["Sit down, please", "Siéntate por favor"], ["Listen to me", "Escúchame"],
+                        ["I wake up early", "Me despierto temprano"], ["We read books", "Leemos libros"],
+                        ["They listen to music", "Ellos escuchan música"], ["I drive a car", "Manejo un auto"],
+                        ["You write emails", "Escribes correos"], ["Open the door", "Abre la puerta"],
+                        ["Close the window", "Cierra la ventana"]
                     ]
                 },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    scales: { r: { angleLines: { color: 'rgba(0,0,0,0.08)' }, grid: { color: 'rgba(0,0,0,0.08)' }, ticks: { display: false, min: 0, max: 100 }, pointLabels: { font: { family: 'Inter', size: 12, weight: '700' }, color: '#1e3a8a' } } },
-                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: {family: 'Inter', size: 12, weight: '600'} } } }
-                }
-            });
-        }
+                v: [
+                    ["💼","work","/wɜːrk/","I work hard"], ["🍽️","eat","/iːt/","We eat food"],
+                    ["💧","drink","/drɪŋk/","You drink water"], ["📖","read","/riːd/","They read books"],
+                    ["✍️","write","/raɪt/","I write emails"], ["🛏️","sleep","/sliːp/","We sleep at night"],
+                    ["🚶","walk","/wɔːk/","You walk fast"], ["🗣️","talk","/tɔːk/","They talk a lot"],
+                    ["📚","study","/ˈstʌdi/","I study English"], ["⚽","play","/pleɪ/","We play soccer"],
+                    ["🏃","run","/rʌn/","You run early"], ["🎧","listen","/ˈlɪsən/","They listen to music"],
+                    ["📺","watch","/wɑːtʃ/","I watch TV"], ["🍳","cook","/kʊk/","We cook dinner"],
+                    ["🧹","clean","/kliːn/","You clean the room"], ["🚪","open","/ˈoʊpən/","They open the door"],
+                    ["🚪","close","/kloʊz/","I close the window"], ["🚗","drive","/draɪv/","We drive cars"],
+                    ["🛒","buy","/baɪ/","You buy food"], ["🏠","live","/lɪv/","I live here"]
+                ],
+                ph: [
+                    { s: "/ɪ/", w: ["sit", "live", "drink", "listen", "window"] },
+                    { s: "/iː/", w: ["eat", "read", "sleep", "speak", "clean"] },
+                    { s: "/aɪ/", w: ["I", "like", "write", "drive", "buy"] },
+                    { s: "/eɪ/", w: ["they", "play", "wake", "make", "day"] }
+                ],
+                ls: {
+                    s: "Hi, I am Mark. I live in London. I work in an office. Every day, I wake up and I drink coffee. Then, I go to work. I like my job. At night, I read books and I sleep.",
+                    qs: [
+                        { q: "Where does Mark live?", o: ["New York", "London", "Paris"], a: 1 },
+                        { q: "What does he drink?", o: ["Water", "Tea", "Coffee"], a: 2 },
+                        { q: "What does he do at night?", o: ["Watch TV", "Read books", "Work"], a: 1 },
+                        { q: "Which imperative is correct?", o: ["I read", "Sit down", "We live"], a: 1 }
+                    ]
+                },
+                pr: [
+                    { t: "fill", q: "I ___ (work) every day.", a: "work" },
+                    { t: "mc", q: "We ___ pizza.", o: ["eats", "eat"], a: 1 },
+                    { t: "error", q: "You likes coffee.", c: "You like coffee" },
+                    { t: "fill", q: "___ (Sit) down, please.", a: "Sit" },
+                    { t: "mc", q: "___ listen to music.", o: ["They", "Them"], a: 0 },
+                    { t: "error", q: "Live I in Colombia.", c: "I live in Colombia" },
+                    { t: "fill", q: "We ___ (go) to school.", a: "go" },
+                    { t: "mc", q: "___ the door!", o: ["Open", "Opens"], a: 0 },
+                    { t: "error", q: "Drink you water.", c: "You drink water" },
+                    { t: "fill", q: "I ___ (read) books.", a: "read" }
+                ],
+                lab: { t: "Daily Actions", d: "Manda un audio diciendo 5 acciones que haces todos los días usando S+V+O." }
+            },
+            {
+                id: 'A1_M3', title: 'Asking & Interaction',
+                subs: ['Do / Does', 'Yes/No questions', 'WH questions', 'Short answers', 'Question intonation'],
+                th: {
+                    intro: "Para interactuar necesitamos preguntar. En inglés, para verbos de acción, usamos los auxiliares mágicos 'DO' y 'DOES'. No significan nada aquí, solo avisan que viene una pregunta.",
+                    f: "WH + Do/Does + Subject + Verb",
+                    blocks: [
+                        { t: "1. Yes/No Questions", d: "Pon 'Do' o 'Does' al inicio. Do you work? Does he play?" },
+                        { t: "2. WH Questions", d: "Añade What, Where, When, Why al inicio. Where do you live?" },
+                        { t: "3. Short Answers", d: "Yes, I do. No, he doesn't. No repitas todo el verbo." }
+                    ],
+                    ex: [
+                        ["Do you like pizza?", "¿Te gusta la pizza?"], ["Does she play tennis?", "¿Ella juega tenis?"],
+                        ["Where do you live?", "¿Dónde vives?"], ["What does he eat?", "¿Qué come él?"],
+                        ["Why do they run?", "¿Por qué corren?"], ["When do we start?", "¿Cuándo empezamos?"],
+                        ["Yes, I do", "Sí"], ["No, she doesn't", "No"],
+                        ["Do they speak English?", "¿Hablan inglés?"], ["What time do you sleep?", "¿A qué hora duermes?"],
+                        ["How do you know?", "¿Cómo sabes?"], ["Who do you call?", "¿A quién llamas?"],
+                        ["Does it work?", "¿Funciona?"], ["Yes, it does", "Sí, funciona"],
+                        ["Where does she work?", "¿Dónde trabaja ella?"]
+                    ]
+                },
+                v: [
+                    ["❓","what","/wɑːt/","What is that?"], ["📍","where","/wer/","Where do you live?"],
+                    ["⏰","when","/wɛn/","When do we eat?"], ["🤷","why","/waɪ/","Why do you ask?"],
+                    ["👤","who","/huː/","Who is he?"], ["🛠️","how","/haʊ/","How do you do it?"],
+                    ["🙋","ask","/æsk/","Ask a question"], ["🗣️","answer","/ˈænsər/","Answer me"],
+                    ["🤔","know","/noʊ/","I know it"], ["💭","think","/θɪŋk/","Think about it"],
+                    ["💡","understand","/ˌʌndərˈstænd/","I understand"], ["🆘","need","/niːd/","I need help"],
+                    ["🤲","want","/wɑːnt/","I want food"], ["🤝","help","/hɛlp/","Help me"],
+                    ["📞","call","/kɔːl/","Call your mom"], ["📱","use","/juːz/","Use the phone"],
+                    ["🏋️","try","/traɪ/","Try again"], ["🗣️","tell","/tɛl/","Tell me"],
+                    ["👄","say","/seɪ/","Say yes"], ["📖","mean","/miːn/","What do you mean?"]
+                ],
+                ph: [
+                    { s: "Intonation ↗", w: ["Do you?", "Does she?", "Can we?", "Is it?"] },
+                    { s: "Intonation ↘", w: ["What?", "Where?", "When?", "Why?"] }
+                ],
+                ls: {
+                    s: "Interviewer: Where do you live, Sarah? Sarah: I live in New York. Interviewer: Do you like it? Sarah: Yes, I do. Interviewer: What do you do on weekends? Sarah: I usually read books and relax.",
+                    qs: [
+                        { q: "Where does Sarah live?", o: ["London", "New York", "Paris"], a: 1 },
+                        { q: "Does she like it?", o: ["Yes, she does", "No, she doesn't", "We don't know"], a: 0 },
+                        { q: "What WH question was asked?", o: ["Why?", "When?", "What do you do?"], a: 2 },
+                        { q: "What does she do on weekends?", o: ["Work", "Read and relax", "Travel"], a: 1 }
+                    ]
+                },
+                pr: [
+                    { t: "fill", q: "___ you like coffee?", a: "Do" },
+                    { t: "mc", q: "___ she live here?", o: ["Do", "Does"], a: 1 },
+                    { t: "error", q: "What does you want?", c: "What do you want" },
+                    { t: "fill", q: "Where ___ (do) they work?", a: "do" },
+                    { t: "mc", q: "Yes, I ___.", o: ["do", "does"], a: 0 },
+                    { t: "error", q: "Do he play soccer?", c: "Does he play soccer" },
+                    { t: "fill", q: "___ does she wake up?", a: "When" },
+                    { t: "mc", q: "___ do you live?", o: ["What", "Where"], a: 1 },
+                    { t: "error", q: "Why you cry?", c: "Why do you cry" },
+                    { t: "fill", q: "Yes, she ___.", a: "does" }
+                ],
+                lab: { t: "Interview a friend", d: "Envía un audio con 5 preguntas que le harías a un nuevo amigo usando Do, Does y WH questions." }
+            },
+            {
+                id: 'A1_M4', title: 'Describing the World',
+                subs: ['There is / There are', 'Prepositions (in, on, under)', 'Basic nouns', 'Countable/uncountable', 'Articles'],
+                th: {
+                    intro: "Para describir qué hay a nuestro alrededor, usamos la frase mágica 'There is' (Hay una cosa) y 'There are' (Hay varias cosas). Las preposiciones nos dirán dónde están.",
+                    f: "There is + a/an + Singular // There are + Plural",
+                    blocks: [
+                        { t: "1. Singular vs Plural", d: "There is a book. There are two books. Súper simple." },
+                        { t: "2. Prepositions", d: "IN (dentro), ON (sobre tocando la superficie), UNDER (debajo), NEXT TO (al lado)." },
+                        { t: "3. Articles", d: "Usa 'a' antes de consonante (a car) y 'an' antes de vocal (an apple)." }
+                    ],
+                    ex: [
+                        ["There is a book on the table", "Hay un libro en la mesa"], ["There are two cars", "Hay dos autos"],
+                        ["There is a cat under the bed", "Hay un gato debajo de la cama"], ["There are many trees", "Hay muchos árboles"],
+                        ["There is an apple", "Hay una manzana"], ["There is a bank next to the school", "Hay un banco al lado"],
+                        ["Is there a hospital?", "¿Hay un hospital?"], ["Are there people?", "¿Hay personas?"],
+                        ["There isn't a computer", "No hay computadora"], ["There aren't any keys", "No hay llaves"],
+                        ["There is water in the glass", "Hay agua en el vaso"], ["There are shoes on the floor", "Hay zapatos en el piso"],
+                        ["There is a picture on the wall", "Hay un cuadro en la pared"], ["There is a dog in the park", "Hay un perro en el parque"],
+                        ["There are three windows", "Hay tres ventanas"]
+                    ]
+                },
+                v: [
+                    ["🏙️","city","/ˈsɪti/","A big city"], ["🛣️","street","/striːt/","On the street"],
+                    ["🏠","house","/haʊs/","My house"], ["🏢","building","/ˈbɪldɪŋ/","Tall building"],
+                    ["🏞️","park","/pɑːrk/","In the park"], ["🏫","school","/skuːl/","Go to school"],
+                    ["🏥","hospital","/ˈhɑːspɪtl/","Near the hospital"], ["🏦","bank","/bæŋk/","At the bank"],
+                    ["🍽️","restaurant","/ˈrɛstərənt/","A good restaurant"], ["🌳","tree","/triː/","Under the tree"],
+                    ["🚗","car","/kɑːr/","Drive a car"], ["🚌","bus","/bʌs/","Take the bus"],
+                    ["🍽️","table","/ˈteɪbəl/","On the table"], ["🪑","chair","/tʃɛr/","Sit on the chair"],
+                    ["🛏️","bed","/bɛd/","Sleep in bed"], ["🪟","window","/ˈwɪndoʊ/","Open the window"],
+                    ["🚪","door","/dɔːr/","Close the door"], ["🛋️","room","/ruːm/","In the room"],
+                    ["💧","water","/ˈwɔːtər/","Drink water"], ["🍕","food","/fuːd/","Eat food"]
+                ],
+                ph: [
+                    { s: "/θ/", w: ["there", "think", "three", "bathroom", "path"] },
+                    { s: "/ð/", w: ["this", "that", "there", "these", "those"] },
+                    { s: "/ʃ/", w: ["shoe", "shirt", "trash", "shelf", "wash"] }
+                ],
+                ls: {
+                    s: "In my room, there is a big bed. Next to the bed, there is a small table. There is a computer on the table. There are two windows in the room. Under the bed, there is a cat.",
+                    qs: [
+                        { q: "What is in the room?", o: ["A sofa", "A big bed", "A TV"], a: 1 },
+                        { q: "Where is the table?", o: ["Next to the bed", "Under the bed", "On the bed"], a: 0 },
+                        { q: "Where is the computer?", o: ["In the bag", "On the table", "Under the chair"], a: 1 },
+                        { q: "How many windows are there?", o: ["One", "Two", "Three"], a: 1 }
+                    ]
+                },
+                pr: [
+                    { t: "fill", q: "___ (There is/There are) a book.", a: "There is" },
+                    { t: "mc", q: "___ two cars.", o: ["There is", "There are"], a: 1 },
+                    { t: "error", q: "There are a hospital.", c: "There is a hospital" },
+                    { t: "fill", q: "The keys are ___ the table.", a: "on" },
+                    { t: "mc", q: "The dog is ___ the bed.", o: ["under", "in"], a: 0 },
+                    { t: "error", q: "There is an car.", c: "There is a car" },
+                    { t: "fill", q: "___ (There is/There are) trees.", a: "There are" },
+                    { t: "mc", q: "___ an apple.", o: ["There is", "There are"], a: 0 },
+                    { t: "error", q: "Is there cars?", c: "Are there cars" },
+                    { t: "fill", q: "The bank is next ___ the school.", a: "to" }
+                ],
+                lab: { t: "Describe your room", d: "Manda un audio describiendo qué hay en tu habitación usando There is, There are y preposiciones." }
+            },
+            {
+                id: 'A1_M6', title: 'Identity (The Verb To Be)',
+                subs: ['Adjectives', 'Word order (adj + noun)', 'Introduction to "to be"', 'Feelings', 'Age'],
+                th: {
+                    intro: "¡Por fin! Ya dominas las acciones y la existencia. Ahora aprenderemos a DESCRIBIR cómo son las personas, objetos y emociones. Aquí es donde entra el famoso verbo 'To Be' (Ser o Estar).",
+                    f: "Subject + To Be (am/is/are) + Adjective/Noun",
+                    blocks: [
+                        { t: "1. The Forms", d: "I am. He/She/It is. You/We/They are." },
+                        { t: "2. Adjective Order", d: "El adjetivo va ANTES de la cosa: 'A red car' (NO a car red)." },
+                        { t: "3. Age and Feelings", d: "En inglés tú ERES tu edad y tus emociones. 'I am 20 years old', 'I am hungry'." }
+                    ],
+                    ex: [
+                        ["I am a student", "Yo soy estudiante"], ["She is very tall", "Ella es muy alta"],
+                        ["We are happy today", "Nosotros estamos felices hoy"], ["It is a red car", "Es un auto rojo"],
+                        ["They are in the park", "Ellos están en el parque"], ["He is a smart boy", "Él es un chico inteligente"],
+                        ["You are my friend", "Tú eres mi amigo"], ["I am tired", "Estoy cansado"],
+                        ["She is a good doctor", "Ella es una buena doctora"], ["The house is big", "La casa es grande"],
+                        ["They are angry", "Ellos están enojados"], ["It is cold outside", "Hace frío afuera"],
+                        ["I am 25 years old", "Tengo 25 años"], ["She is hungry", "Ella tiene hambre"],
+                        ["The sky is blue", "El cielo es azul"]
+                    ]
+                },
+                v: [
+                    ["😀","happy","/ˈhæpi/","I am happy"], ["😢","sad","/sæd/","She is sad"],
+                    ["😡","angry","/ˈæŋɡri/","He is angry"], ["🥱","tired","/ˈtaɪərd/","We are tired"],
+                    ["📏","tall","/tɔːl/","He is tall"], ["📉","short","/ʃɔːrt/","She is short"],
+                    ["🐘","big","/bɪɡ/","A big elephant"], ["🐁","small","/smɔːl/","A small mouse"],
+                    ["🔴","red","/rɛd/","A red car"], ["🔵","blue","/bluː/","The blue sky"],
+                    ["🧠","smart","/smɑːrt/","A smart girl"], ["😂","funny","/ˈfʌni/","He is funny"],
+                    ["🏃","fast","/fæst/","A fast car"], ["🐢","slow","/sloʊ/","A slow turtle"],
+                    ["🥶","cold","/koʊld/","It is cold"], ["🔥","hot","/hɑːt/","It is hot"],
+                    ["Красивый","beautiful","/ˈbjuːtɪfəl/","Beautiful house"], ["💪","strong","/strɔːŋ/","A strong man"],
+                    ["👶","young","/jʌŋ/","A young boy"], ["👴","old","/oʊld/","An old book"]
+                ],
+                ph: [
+                    { s: "Contractions", w: ["I'm", "You're", "He's", "She's", "We're"] },
+                    { s: "/ɑː/", w: ["are", "car", "smart", "hard", "park"] },
+                    { s: "/ɔː/", w: ["tall", "small", "all", "call", "fall"] }
+                ],
+                ls: {
+                    s: "Hello. I am Jessica. I am 25 years old. I am a teacher. My school is very big. I have a new car, it is a fast red car. Today, I am very happy.",
+                    qs: [
+                        { q: "What is Jessica's profession?", o: ["Doctor", "Teacher", "Student"], a: 1 },
+                        { q: "How is her school?", o: ["Small", "Old", "Big"], a: 2 },
+                        { q: "How does she feel today?", o: ["Sad", "Tired", "Happy"], a: 2 },
+                        { q: "What is the word order for the car?", o: ["Car red fast", "Fast red car", "Red car fast"], a: 1 }
+                    ]
+                },
+                pr: [
+                    { t: "fill", q: "I ___ (be) a student.", a: "am" },
+                    { t: "mc", q: "She ___ very tall.", o: ["are", "is"], a: 1 },
+                    { t: "error", q: "It is a car red.", c: "It is a red car" },
+                    { t: "fill", q: "We ___ (be) happy today.", a: "are" },
+                    { t: "mc", q: "They ___ in the park.", o: ["is", "are"], a: 1 },
+                    { t: "error", q: "He are a smart boy.", c: "He is a smart boy" },
+                    { t: "fill", q: "You ___ (be) my friend.", a: "are" },
+                    { t: "mc", q: "I have a ___ house.", o: ["big", "house big"], a: 0 },
+                    { t: "error", q: "She am tired.", c: "She is tired" },
+                    { t: "fill", q: "It ___ (be) cold outside.", a: "is" }
+                ],
+                lab: { t: "Describe Yourself", d: "Envía un audio diciendo quién eres, cuántos años tienes y cómo te sientes hoy usando 'To be'." }
+            }
+        ]
+    },
+    A2: {
+        color: 'from-emerald-500 to-teal-500', theme: 'emerald',
+        mods: [
+            {
+                id: 'A2_M1', title: 'Past Experiences (Regular)',
+                subs: ['Past Simple (regular)', 'Time expressions', 'Pronunciation (-ed)', 'Storytelling basics', 'Connectors'],
+                th: {
+                    intro: "Para contar aventuras y anécdotas, viajamos al Pasado Simple. Para los verbos regulares, la magia ocurre simplemente añadiendo '-ed' al final de la acción. ¡Y lo mejor es que es igual para todos los sujetos!",
+                    f: "Subject + Verb(-ed) + Past Time Marker",
+                    blocks: [
+                        { t: "1. The Magic '-ed'", d: "Work -> Worked. Play -> Played. Sirve para I, You, He, She, We y They." },
+                        { t: "2. Time Markers", d: "Ponlos al final: 'yesterday' (ayer), 'last week' (la semana pasada), 'two days ago' (hace 2 días)." },
+                        { t: "3. Connectors", d: "Conecta tu historia: 'First' (Primero), 'Then' (Luego), 'After that' (Después)." }
+                    ],
+                    ex: [
+                        ["I visited London last year", "Visité Londres el año pasado"], ["She played tennis yesterday", "Ella jugó tenis ayer"],
+                        ["We watched a movie last night", "Vimos una película anoche"], ["He worked in a bank", "Él trabajó en un banco"],
+                        ["They traveled to Spain", "Viajaron a España"], ["I arrived two days ago", "Llegué hace dos días"],
+                        ["She studied all night", "Ella estudió toda la noche"], ["We listened to the radio", "Escuchamos la radio"],
+                        ["He walked to the park", "Él caminó al parque"], ["They cleaned the house", "Ellos limpiaron la casa"],
+                        ["I opened the window", "Abrí la ventana"], ["She liked the food", "A ella le gustó la comida"],
+                        ["We talked for hours", "Hablamos por horas"], ["He jumped very high", "Él saltó muy alto"],
+                        ["They smiled at me", "Me sonrieron"]
+                    ]
+                },
+                v: [
+                    ["📅","yesterday","/ˈjɛstərdeɪ/","I arrived yesterday"], ["📆","last week","/læst wiːk/","She traveled last week"],
+                    ["🕰️","ago","/əˈɡoʊ/","Two days ago"], ["✈️","travel","/ˈtrævəl/","We traveled to Paris"],
+                    ["🏨","visit","/ˈvɪzɪt/","I visited a museum"], ["🛬","arrive","/əˈraɪv/","They arrived late"],
+                    ["🗣️","talk","/tɔːk/","We talked yesterday"], ["📺","watch","/wɑːtʃ/","He watched TV"],
+                    ["🚶","walk","/wɔːk/","She walked home"], ["💼","work","/wɜːrk/","I worked hard"],
+                    ["🧹","clean","/kliːn/","They cleaned the room"], ["🚪","open","/ˈoʊpən/","He opened the door"],
+                    ["👍","like","/laɪk/","I liked the movie"], ["🎧","listen","/ˈlɪsən/","We listened to music"],
+                    ["⚽","play","/pleɪ/","They played soccer"], ["🏕️","stay","/steɪ/","We stayed in a tent"],
+                    ["🗺️","map","/mæp/","I looked at the map"], ["🎒","pack","/pæk/","She packed her bag"],
+                    ["🌧️","rain","/reɪn/","It rained yesterday"], ["😊","smile","/smaɪl/","He smiled"]
+                ],
+                ph: [
+                    { s: "/t/ (-ed)", w: ["worked", "walked", "watched", "liked", "talked"] },
+                    { s: "/d/ (-ed)", w: ["played", "listened", "arrived", "traveled", "cleaned"] },
+                    { s: "/ɪd/ (-ed)", w: ["visited", "wanted", "needed", "started", "decided"] }
+                ],
+                ls: {
+                    s: "Yesterday I traveled to a small town. First, I visited a museum. Then, I walked in the park. After that, I watched a play. I liked the actors. I arrived home late.",
+                    qs: [
+                        { q: "When did the story happen?", o: ["Last year", "Yesterday", "Two days ago"], a: 1 },
+                        { q: "What did the person visit first?", o: ["A museum", "A park", "A theater"], a: 0 },
+                        { q: "What did they do in the park?", o: ["Played", "Walked", "Watched a play"], a: 1 },
+                        { q: "When did they arrive home?", o: ["Morning", "Afternoon", "Late at night"], a: 2 }
+                    ]
+                },
+                pr: [
+                    { t: "fill", q: "I ___ (travel) to Spain.", a: "traveled" },
+                    { t: "mc", q: "She ___ soccer yesterday.", o: ["play", "played"], a: 1 },
+                    { t: "error", q: "We watch a movie last night.", c: "We watched a movie last night" },
+                    { t: "fill", q: "He ___ (work) in a bank.", a: "worked" },
+                    { t: "mc", q: "They ___ two days ___.", o: ["arrived / ago", "arrive / last"], a: 0 },
+                    { t: "error", q: "I visited London yesterday week.", c: "I visited London last week" },
+                    { t: "fill", q: "She ___ (like) the food.", a: "liked" },
+                    { t: "mc", q: "We ___ to the radio.", o: ["listened", "listen"], a: 0 },
+                    { t: "error", q: "He walked home ago two days.", c: "He walked home two days ago" },
+                    { t: "fill", q: "They ___ (clean) the house.", a: "cleaned" }
+                ],
+                lab: { t: "Tell a story", d: "Envía un audio describiendo lo que hiciste ayer usando conectores (First, then, after that) y verbos regulares en pasado." }
+            },
+            {
+                id: 'A2_M2', title: 'The Irregular World',
+                subs: ['Irregular verbs', 'Questions in past (Did)', 'Negatives in past (Didn\'t)', 'Common irregular patterns'],
+                th: {
+                    intro: "Muchos verbos hiper-comunes no usan '-ed' en pasado, sino que cambian su forma por completo. Además, aprenderemos a hacer preguntas y negaciones usando nuestro nuevo mejor amigo: DID.",
+                    f: "Subject + Irregular Past // Subject + DIDN'T + Normal Verb",
+                    blocks: [
+                        { t: "1. Complete Changes", d: "Go -> Went. See -> Saw. Eat -> Ate. Tienes que memorizarlos con la práctica." },
+                        { t: "2. The 'Didn't' Trick", d: "Para decir 'NO' en pasado, usa 'didn't'. El verbo vuelve a su forma base: I didn't go (NO I didn't went)." },
+                        { t: "3. Asking with 'DID'", d: "Para preguntar, pon 'Did' al inicio. El verbo es normal: Did you eat?" }
+                    ],
+                    ex: [
+                        ["I went to the store", "Fui a la tienda"], ["She saw a bird", "Ella vio un pájaro"],
+                        ["We ate pizza", "Comimos pizza"], ["He didn't go to work", "Él no fue a trabajar"],
+                        ["Did you see the movie?", "¿Viste la película?"], ["They bought a house", "Ellos compraron una casa"],
+                        ["I didn't buy a car", "No compré un auto"], ["She flew to Paris", "Ella voló a París"],
+                        ["Did they fly to Madrid?", "¿Volaron a Madrid?"], ["He spoke English", "Él habló inglés"],
+                        ["We knew the answer", "Sabíamos la respuesta"], ["I found my keys", "Encontré mis llaves"],
+                        ["She didn't find her phone", "Ella no encontró su teléfono"], ["Did you sleep well?", "¿Dormiste bien?"],
+                        ["They drank coffee", "Bebieron café"]
+                    ]
+                },
+                v: [
+                    ["🏃","went","/wɛnt/","He went home"], ["👀","saw","/sɔː/","We saw a bird"],
+                    ["✅","did","/dɪd/","They did the work"], ["🤲","had","/hæd/","I had a good time"],
+                    ["🛠️","made","/meɪd/","She made a cake"], ["🚶","came","/keɪm/","He came late"],
+                    ["📸","took","/tʊk/","We took a photo"], ["🎁","gave","/ɡeɪv/","They gave me a gift"],
+                    ["🎯","got","/ɡɑːt/","I got a new job"], ["🔍","found","/faʊnd/","She found her keys"],
+                    ["🚪","left","/lɛft/","He left the house"], ["❤️","felt","/fɛlt/","We felt happy"],
+                    ["🤔","thought","/θɔːt/","I thought about it"], ["🗣️","spoke","/spoʊk/","He spoke English"],
+                    ["📣","told","/toʊld/","We told a story"], ["🏆","won","/wʌn/","They won the match"],
+                    ["✍️","wrote","/roʊt/","I wrote an email"], ["📖","read","/rɛd/","She read a book"],
+                    ["🏊","swam","/swæm/","We swam in the sea"], ["🎤","sang","/sæŋ/","They sang a song"]
+                ],
+                ph: [
+                    { s: "/ɔː/", w: ["saw", "bought", "thought", "caught", "fought"] },
+                    { s: "/æ/", w: ["drank", "sang", "ran", "swam", "sat"] },
+                    { s: "/uː/", w: ["knew", "flew", "blew", "grew", "threw"] },
+                    { s: "/ɛ/", w: ["left", "felt", "slept", "kept", "read"] }
+                ],
+                ls: {
+                    s: "Last weekend, I went to the mountains. I took my camera and saw many beautiful animals. I didn't see any bears! Did you have a good weekend?",
+                    qs: [
+                        { q: "Where did the person go?", o: ["Beach", "City", "Mountains"], a: 2 },
+                        { q: "What did they take?", o: ["A book", "A camera", "A map"], a: 1 },
+                        { q: "What didn't they see?", o: ["Birds", "Bears", "Trees"], a: 1 },
+                        { q: "Did the verb 'see' change to 'saw' in the negative?", o: ["Yes", "No"], a: 1 }
+                    ]
+                },
+                pr: [
+                    { t: "fill", q: "I ___ (go) to the store.", a: "went" },
+                    { t: "mc", q: "She ___ pizza last night.", o: ["eated", "ate"], a: 1 },
+                    { t: "error", q: "He didn't went to work.", c: "He didn't go to work" },
+                    { t: "fill", q: "___ (you/see) the movie?", a: "Did you see" },
+                    { t: "mc", q: "They ___ a new car.", o: ["bought", "buyed"], a: 0 },
+                    { t: "error", q: "I didn't bought a car.", c: "I didn't buy a car" },
+                    { t: "fill", q: "She ___ (fly) to Paris.", a: "flew" },
+                    { t: "mc", q: "___ they fly?", o: ["Did", "Do"], a: 0 },
+                    { t: "error", q: "He speaked English.", c: "He spoke English" },
+                    { t: "fill", q: "I ___ (find) my keys.", a: "found" }
+                ],
+                lab: { t: "A crazy weekend", d: "Manda un audio contando algo de tu fin de semana usando 5 verbos irregulares y una oración negativa con didn't." }
+            },
+            {
+                id: 'A2_M4', title: 'Future Plans (Going To)',
+                subs: ['Going to', 'Intentions vs plans', 'Future time expressions', 'Travel plans'],
+                th: {
+                    intro: "Para hablar del futuro cuando ya tienes un PLAN o INTENCIÓN, usamos 'Going to'. Es como decir 'Voy a...' en español.",
+                    f: "Subject + To Be (am/is/are) + going to + Verb",
+                    blocks: [
+                        { t: "1. The Formula", d: "I am going to travel. She is going to study." },
+                        { t: "2. Negatives", d: "I am not going to travel. He isn't going to call." },
+                        { t: "3. Time Expressions", d: "Tomorrow (mañana), Next week (la próxima semana)." }
+                    ],
+                    ex: [
+                        ["I am going to travel", "Voy a viajar"], ["She is going to study", "Ella va a estudiar"],
+                        ["We are going to eat", "Vamos a comer"], ["They are going to play", "Van a jugar"],
+                        ["He is not going to call", "Él no va a llamar"], ["Are you going to sleep?", "¿Vas a dormir?"],
+                        ["I am going to visit Paris", "Voy a visitar París"], ["We are going to buy a house", "Vamos a comprar una casa"],
+                        ["She is going to watch TV", "Va a ver TV"], ["They aren't going to come", "No van a venir"],
+                        ["I am going to start a diet", "Voy a empezar una dieta"], ["Is he going to work?", "¿Va a trabajar?"],
+                        ["We are going to win", "Vamos a ganar"], ["I am going to cook", "Voy a cocinar"],
+                        ["You are going to like it", "Te va a gustar"]
+                    ]
+                },
+                v: [
+                    ["✈️","travel","/ˈtrævəl/","Going to travel"], ["🧳","pack","/pæk/","Pack bags"],
+                    ["📅","tomorrow","/təˈmɔːroʊ/","Tomorrow morning"], ["📆","next week","/nɛkst wiːk/","Next week"],
+                    ["🏨","book","/bʊk/","Book a hotel"], ["🎫","ticket","/ˈtɪkɪt/","Buy a ticket"],
+                    ["🛫","fly","/flaɪ/","Fly to Rome"], ["🗺️","plan","/plæn/","Plan a trip"],
+                    ["🏖️","relax","/rɪˈlæks/","Relax on beach"], ["📸","photos","/ˈfoʊtoʊz/","Take photos"],
+                    ["💸","save","/seɪv/","Save money"], ["🚗","rent","/rɛnt/","Rent a car"],
+                    ["🍽️","eat out","/iːt aʊt/","Eat out"], ["🚶","explore","/ɪkˈsplɔːr/","Explore city"],
+                    ["🎉","party","/ˈpɑːrti/","Have a party"], ["🫂","visit","/ˈvɪzɪt/","Visit friends"],
+                    ["📖","learn","/lɜːrn/","Learn English"], ["🚀","start","/stɑːrt/","Start a job"],
+                    ["🏠","move","/muːv/","Move house"], ["🎯","try","/traɪ/","Try new food"]
+                ],
+                ph: [
+                    { s: "Gonna (Informal)", w: ["I'm gonna", "She's gonna", "We're gonna"] },
+                    { s: "/tʊ/ (to)", w: ["going to", "want to", "need to"] }
+                ],
+                ls: {
+                    s: "Next month, I am going to travel to Japan. I am going to stay in Tokyo. I am going to eat a lot of sushi. I am not going to rent a car, I am going to take the train.",
+                    qs: [
+                        { q: "Where is the person going to travel?", o: ["China", "Japan", "Korea"], a: 1 },
+                        { q: "What is she going to eat?", o: ["Pizza", "Tacos", "Sushi"], a: 2 },
+                        { q: "Is she going to rent a car?", o: ["Yes", "No"], a: 1 },
+                        { q: "How is she going to travel in the country?", o: ["By bus", "By train", "By plane"], a: 1 }
+                    ]
+                },
+                pr: [
+                    { t: "fill", q: "I ___ (am/is/are) going to travel.", a: "am" },
+                    { t: "mc", q: "She ___ going to study.", o: ["is", "are"], a: 0 },
+                    { t: "error", q: "We going to eat.", c: "We are going to eat" },
+                    { t: "fill", q: "They are going ___ play.", a: "to" },
+                    { t: "mc", q: "I ___ going to call.", o: ["am not", "not am"], a: 0 },
+                    { t: "error", q: "Are you go to sleep?", c: "Are you going to sleep" },
+                    { t: "fill", q: "He ___ (be) going to work.", a: "is" },
+                    { t: "mc", q: "We are going to ___.", o: ["win", "winning"], a: 0 },
+                    { t: "error", q: "I am going cook.", c: "I am going to cook" },
+                    { t: "fill", q: "___ you going to come?", a: "Are" }
+                ],
+                lab: { t: "Your Future Plans", d: "Manda un audio diciendo 3 cosas que VAS A HACER el próximo mes usando 'going to'." }
+            }
+        ]
+    },
+    B1: {
+        color: 'from-indigo-600 to-purple-600', theme: 'indigo',
+        mods: [
+            {
+                id: 'B1_M1', title: 'Life Experiences (Present Perfect)',
+                subs: ['Present Perfect (ever/never)', 'Experiences vs finished actions', 'Past Participles', 'Travel & life vocabulary'],
+                th: {
+                    intro: "En B1 la precisión importa. El 'Present Perfect' es como tu currículum de vida: lo usamos cuando la EXPERIENCIA importa, pero el TIEMPO EXACTO no importa o no se dice. Si mencionas *cuándo* ocurrió (yesterday, in 2010), DEBES usar el Pasado Simple.",
+                    f: "Subject + have / has + Past Participle",
+                    blocks: [
+                        { t: "1. The Life Resume", d: "Usa 'Have/Has' más el verbo en participio (terminaciones -ado/-ido en español). Ejemplo: I have seen that movie." },
+                        { t: "2. Ever & Never", d: "Have you 'ever' (alguna vez) eaten sushi? I have 'never' (nunca) been to Paris." },
+                        { t: "3. The Contrast Rule", d: "Experience: I have visited Spain. // Detail: I visited Spain IN 2019." }
+                    ],
+                    ex: [
+                        ["I have visited Spain", "He visitado España (experiencia)"], ["I visited Spain in 2019", "Visité España en 2019 (detalle)"],
+                        ["She has eaten sushi", "Ella ha comido sushi"], ["She ate sushi yesterday", "Ella comió sushi ayer"],
+                        ["Have you ever been to Paris?", "¿Alguna vez has estado en París?"], ["Did you go to Paris last year?", "¿Fuiste a París el año pasado?"],
+                        ["I have never seen that movie", "Nunca he visto esa película"], ["I didn't see it yesterday", "No la vi ayer"],
+                        ["He has broken his leg", "Él se ha roto la pierna"], ["He broke his leg skiing", "Se rompió la pierna esquiando"],
+                        ["They have lived here for years", "Han vivido aquí por años"], ["They moved here in 2010", "Se mudaron en 2010"],
+                        ["I have lost my keys", "He perdido mis llaves"], ["She has read that book", "Ella ha leído ese libro"],
+                        ["We have met the president", "Hemos conocido al presidente"]
+                    ]
+                },
+                v: [
+                    ["🌟","experience","/ɪkˈspɪəriəns/","A great experience"], ["🎯","achieve","/əˈtʃiːv/","I achieved my goal"],
+                    ["🧗","challenge","/ˈtʃælɪndʒ/","A big challenge"], ["🚪","opportunity","/ˌɑːpərˈtuːnəti/","A good opportunity"],
+                    ["🏆","success","/səkˈsɛs/","He had success"], ["❌","failure","/ˈfeɪljər/","Failure is a lesson"],
+                    ["🏅","achievement","/əˈtʃiːvmənt/","Huge achievement"], ["🚫","mistake","/mɪˈsteɪk/","I made a mistake"],
+                    ["⚖️","decision","/dɪˈsɪʒən/","A hard decision"], ["👔","career","/kəˈrɪər/","A successful career"],
+                    ["🤹","skill","/skɪl/","A useful skill"], ["✨","talent","/ˈtælənt/","Natural talent"],
+                    ["🎓","education","/ˌɛdʒuˈkeɪʃən/","Good education"], ["📈","promotion","/prəˈmoʊʃən/","I got a promotion"],
+                    ["📊","project","/ˈprɑːdʒɛkt/","A new project"], ["🤝","interview","/ˈɪntərvjuː/","Job interview"],
+                    ["💵","salary","/ˈsæləri/","High salary"], ["👨‍💼","boss","/bɔːs/","My boss is strict"],
+                    ["👥","colleague","/ˈkɑːliːɡ/","Friendly colleague"], ["🌍","abroad","/əˈbrɔːd/","Travel abroad"]
+                ],
+                ph: [
+                    { s: "I've / We've", w: ["I've been", "I've seen", "We've met", "We've traveled"] },
+                    { s: "He's / She's", w: ["He's lived", "She's worked", "He's decided"] },
+                    { s: "Irregular Participles", w: ["eaten", "written", "spoken", "driven", "flown"] }
+                ],
+                ls: {
+                    s: "I have worked in this company for 5 years. It has been a great experience. I have learned many new skills. Last year, I managed a big project and we achieved our goals.",
+                    qs: [
+                        { q: "What tense is 'I have worked'?", o: ["Past Simple", "Present Perfect", "Present Simple"], a: 1 },
+                        { q: "What has the speaker learned?", o: ["Languages", "Software", "Skills"], a: 2 },
+                        { q: "What did the speaker do last year?", o: ["Quit the job", "Managed a project", "Got a promotion"], a: 1 },
+                        { q: "Did they achieve their goals?", o: ["Yes", "No", "Not mentioned"], a: 0 }
+                    ]
+                },
+                pr: [
+                    { t: "fill", q: "I ___ (visit) Japan three times.", a: "have visited" },
+                    { t: "mc", q: "She ___ to New York last summer.", o: ["has gone", "went"], a: 1 },
+                    { t: "error", q: "I have saw that movie.", c: "I have seen that movie" },
+                    { t: "fill", q: "___ (you/ever/eat) sushi?", a: "Have you ever eaten" },
+                    { t: "mc", q: "He ___ the project yesterday.", o: ["has finished", "finished"], a: 1 },
+                    { t: "error", q: "I have lived here in 2010.", c: "I lived here in 2010" },
+                    { t: "fill", q: "They ___ (buy) a house last week.", a: "bought" },
+                    { t: "mc", q: "I ___ him last night.", o: ["have seen", "saw"], a: 1 },
+                    { t: "error", q: "Have you go to Paris?", c: "Have you been to Paris" },
+                    { t: "fill", q: "She ___ (never/fly) in a plane.", a: "has never flown" }
+                ],
+                lab: { t: "Discuss your greatest achievement", d: "Habla sobre una experiencia importante usando Present Perfect para la experiencia y Past Simple para los detalles ('It happened in 2020...')." }
+            },
+            {
+                id: 'B1_M3', title: 'Future Decisions (Will vs Going To)',
+                subs: ['Will vs Going to', 'Spontaneous decisions', 'Predictions based on evidence', 'Promises', 'Offers'],
+                th: {
+                    intro: "En B1 aprendemos que el futuro en inglés depende de la INTENCIÓN. Usamos 'Will' para decisiones espontáneas, promesas y predicciones sin evidencia. Usamos 'Going to' para planes ya decididos y predicciones con evidencia obvia.",
+                    f: "Subject + Will + Verb // Subject + be going to + Verb",
+                    blocks: [
+                        { t: "1. Spontaneous vs Planned", d: "Alguien toca la puerta: 'I WILL open it' (Decisión rápida). 'I am GOING TO travel next month' (Plan)." },
+                        { t: "2. Predictions", d: "I think it WILL rain (Opinión). Look at those black clouds, it is GOING TO rain! (Evidencia)." },
+                        { t: "3. Promises & Offers", d: "I will help you! I will always love you." }
+                    ],
+                    ex: [
+                        ["I will answer the phone", "Yo contestaré el teléfono (decisión rápida)"], ["I am going to study tonight", "Voy a estudiar esta noche (plan)"],
+                        ["I think he will win", "Creo que él ganará (opinión)"], ["Look at the score, they are going to win", "Mira el marcador, van a ganar (evidencia)"],
+                        ["I will always love you", "Siempre te amaré (promesa)"], ["I will help you with those bags", "Te ayudaré con esas bolsas (oferta)"],
+                        ["She is going to have a baby", "Ella va a tener un bebé (plan/evidencia)"], ["I'll have a coffee, please", "Tomaré un café, por favor (restaurante)"],
+                        ["Are you going to buy that?", "¿Vas a comprar eso?"], ["Will you marry me?", "¿Te casarías conmigo?"],
+                        ["I won't tell anyone", "No se lo diré a nadie"], ["We are going to move to Paris", "Nos vamos a mudar a París"],
+                        ["It will probably rain tomorrow", "Probablemente lloverá mañana"], ["Watch out! You are going to fall!", "¡Cuidado! ¡Te vas a caer!"],
+                        ["I will pay for dinner", "Yo pagaré la cena"]
+                    ]
+                },
+                v: [
+                    ["🔮","predict","/prɪˈdɪkt/","I predict success"], ["🤝","promise","/ˈprɑːmɪs/","I promise you"],
+                    ["🙋","offer","/ˈɔːfər/","Offer help"], ["🤔","decide","/dɪˈsaɪd/","Decide quickly"],
+                    ["💭","think","/θɪŋk/","I think he will"], ["📅","plan","/plæn/","Plan a trip"],
+                    ["💍","marry","/ˈmæri/","Will you marry me?"], ["☁️","clouds","/klaʊdz/","Black clouds"],
+                    ["🏃","fall","/fɔːl/","Going to fall"], ["💳","pay","/peɪ/","I will pay"],
+                    ["💼","carry","/ˈkæri/","I will carry it"], ["🤫","secret","/ˈsiːkrɪt/","Keep a secret"],
+                    ["🍀","luck","/lʌk/","Good luck"], ["🏅","win","/wɪn/","They will win"],
+                    ["📉","lose","/luːz/","Going to lose"], ["🎁","give","/ɡɪv/","Will give you"],
+                    ["✈️","move","/muːv/","Move to Spain"], ["🚗","drive","/draɪv/","I will drive"],
+                    ["🍽️","order","/ˈɔːrdər/","Order food"], ["📞","answer","/ˈænsər/","Answer the phone"]
+                ],
+                ph: [
+                    { s: "Contractions ('ll)", w: ["I'll", "You'll", "He'll", "She'll", "We'll", "They'll"] },
+                    { s: "Won't", w: ["I won't", "We won't", "It won't"] }
+                ],
+                ls: {
+                    s: "A: What are your plans for the weekend? B: I am going to visit my parents. What about you? A: I don't know yet. Maybe I will just stay home and watch movies. Oh, the phone is ringing! I'll get it.",
+                    qs: [
+                        { q: "What is B's plan?", o: ["Stay home", "Visit parents", "Watch movies"], a: 1 },
+                        { q: "Does A have a plan?", o: ["Yes", "No"], a: 1 },
+                        { q: "What tense does A use for the weekend?", o: ["Going to", "Will"], a: 1 },
+                        { q: "Why does A say 'I'll get it'?", o: ["It's a plan", "Spontaneous decision", "Prediction"], a: 1 }
+                    ]
+                },
+                pr: [
+                    { t: "fill", q: "The phone is ringing. I ___ (answer) it.", a: "will answer" },
+                    { t: "mc", q: "I bought the tickets. I ___ to Paris.", o: ["will fly", "am going to fly"], a: 1 },
+                    { t: "error", q: "I promise I am going to help you.", c: "I promise I will help you" },
+                    { t: "fill", q: "Look at those black clouds! It ___ (rain).", a: "is going to rain" },
+                    { t: "mc", q: "I think people ___ on Mars in 2050.", o: ["will live", "are going to live"], a: 0 },
+                    { t: "error", q: "I'll to open the door.", c: "I'll open the door" },
+                    { t: "fill", q: "We ___ (have) a party next weekend. We bought the food.", a: "are going to have" },
+                    { t: "mc", q: "Wait, you dropped your bag. I ___ help you.", o: ["will", "am going to"], a: 0 },
+                    { t: "error", q: "I won't to tell your secret.", c: "I won't tell your secret" },
+                    { t: "fill", q: "A: I'm cold. B: I ___ (close) the window.", a: "will close" }
+                ],
+                lab: { t: "Plans vs Decisions", d: "Manda un audio diciendo 1 plan seguro que tienes ('I am going to...') y 1 predicción sobre el futuro del mundo ('I think we will...')." }
+            },
+            {
+                id: 'B1_M4', title: 'Logical Thinking (Conditionals)',
+                subs: ['Zero Conditional', 'First Conditional', 'Cause and effect', 'If / Unless', 'Problem solving'],
+                th: {
+                    intro: "Para hablar de causa y efecto usamos los Condicionales. El Condicional Cero es para hechos científicos o verdades universales. El Primer Condicional es para situaciones futuras reales y posibles.",
+                    f: "Zero: If + Present, Present // First: If + Present, Will + Verb",
+                    blocks: [
+                        { t: "1. Zero Conditional", d: "Hechos 100% reales. If you heat water, it boils. (Si calientas agua, hierve)." },
+                        { t: "2. First Conditional", d: "Planes futuros probables. If it rains tomorrow, I will stay home." },
+                        { t: "3. Unless", d: "'Unless' significa 'a menos que' (If not). I won't go unless you come (No iré a menos que tú vengas)." }
+                    ],
+                    ex: [
+                        ["If you heat ice, it melts", "Si calientas hielo, se derrite"], ["If you don't sleep, you get tired", "Si no duermes, te cansas"],
+                        ["If it rains tomorrow, I will stay home", "Si llueve mañana, me quedaré en casa"], ["If she studies hard, she will pass the exam", "Si ella estudia duro, pasará el examen"],
+                        ["I will call you if I have time", "Te llamaré si tengo tiempo"], ["If you mix red and blue, you get purple", "Si mezclas rojo y azul, obtienes morado"],
+                        ["What will you do if you lose your job?", "¿Qué harás si pierdes tu trabajo?"], ["If he doesn't hurry, he will miss the train", "Si no se da prisa, perderá el tren"],
+                        ["I won't go unless you come with me", "No iré a menos que vengas conmigo"], ["Unless we leave now, we will be late", "A menos que salgamos ahora, llegaremos tarde"],
+                        ["If plants don't get water, they die", "Si las plantas no reciben agua, mueren"], ["If I see him, I will tell him", "Si lo veo, le diré"],
+                        ["She will be angry if you break that", "Ella se enojará si rompes eso"], ["If you freeze water, it becomes ice", "Si congelas agua, se vuelve hielo"],
+                        ["If I win the lottery, I will buy a house", "Si gano la lotería, compraré una casa"]
+                    ]
+                },
+                v: [
+                    ["⚖️","if","/ɪf/","If it rains"], ["🚫","unless","/ənˈlɛs/","Unless you help"],
+                    ["🌡️","heat","/hiːt/","Heat water"], ["❄️","freeze","/friːz/","Freeze water"],
+                    ["💧","melt","/mɛlt/","Ice melts"], ["🔥","boil","/bɔɪl/","Water boils"],
+                    ["🎓","pass","/pæs/","Pass the exam"], ["❌","fail","/feɪl/","Fail the test"],
+                    ["🏃","hurry","/ˈhɜːri/","Hurry up"], ["🚆","miss","/mɪs/","Miss the train"],
+                    ["⏰","late","/leɪt/","Be late"], ["🎨","mix","/mɪks/","Mix colors"],
+                    ["🌱","die","/daɪ/","Plants die"], ["😠","angry","/ˈæŋɡri/","She will be angry"],
+                    ["💰","lottery","/ˈlɑːtəri/","Win the lottery"], ["📞","call","/kɔːl/","I will call"],
+                    ["🏠","stay","/steɪ/","Stay home"], ["💼","lose","/luːz/","Lose job"],
+                    ["🔍","find","/faɪnd/","Find answer"], ["💡","solve","/sɑːlv/","Solve problem"]
+                ],
+                ph: [
+                    { s: "Pause (comma)", w: ["If it rains, [pause] I will..."] },
+                    { s: "/s/ vs /z/", w: ["unless", "miss", "lose", "freeze"] }
+                ],
+                ls: {
+                    s: "I need to pass my English exam. If I pass the exam, my parents will buy me a new computer. But if I don't study, I will fail. Unless I start studying right now, I won't get that computer.",
+                    qs: [
+                        { q: "What happens if the speaker passes the exam?", o: ["Gets a car", "Gets a computer", "Gets money"], a: 1 },
+                        { q: "What happens if they don't study?", o: ["Pass", "Fail", "Nothing"], a: 1 },
+                        { q: "What does 'Unless I start studying' mean?", o: ["If I start", "If I don't start", "When I start"], a: 1 },
+                        { q: "What type of conditional is mainly used here?", o: ["Zero Conditional", "First Conditional", "Second Conditional"], a: 1 }
+                    ]
+                },
+                pr: [
+                    { t: "fill", q: "If you freeze water, it ___ (become) ice.", a: "becomes" },
+                    { t: "mc", q: "If it rains tomorrow, I ___ at home.", o: ["will stay", "stay"], a: 0 },
+                    { t: "error", q: "If I will see him, I will tell him.", c: "If I see him, I will tell him" },
+                    { t: "fill", q: "You will miss the train ___ (unless / if) you hurry.", a: "unless" },
+                    { t: "mc", q: "If she ___, she will pass.", o: ["studies", "will study"], a: 0 },
+                    { t: "error", q: "Unless you don't help me, I will fail.", c: "Unless you help me, I will fail" },
+                    { t: "fill", q: "If plants don't get water, they ___ (die).", a: "die" },
+                    { t: "mc", q: "I won't go ___ you come with me.", o: ["if", "unless"], a: 1 },
+                    { t: "error", q: "If you heat ice, it melt.", c: "If you heat ice, it melts" },
+                    { t: "fill", q: "What ___ (you / do) if you lose your job?", a: "will you do" }
+                ],
+                lab: { t: "Cause and Effect", d: "Manda un audio con 2 oraciones: Un 'Zero conditional' científico (If you...) y un 'First conditional' sobre tu futuro (If I pass my exam...)." }
+            }
+        ]
+    }
+};
 
-        window.onload = () => {
-            initRadarChart();
-            filterMonths(1);
-            openGlossaryTab('Todos');
+const State = {
+    lvl: 'A1', mod: 'A1_M1', tab: 'theory',
+    init() { this.hash(); window.addEventListener('hashchange', () => this.hash()); },
+    hash() {
+        const [l, m, t] = window.location.hash.replace('#', '').split('/');
+        if (l && DATA[l]) { this.lvl = l; this.mod = m || DATA[l].mods[0].id; this.tab = t || 'theory'; }
+        Render.all();
+    },
+    update(l, m, t) { window.location.hash = `${l}/${m}/${t}`; }
+};
+
+const AudioSvc = {
+    speak(txt) {
+        if (!('speechSynthesis' in window)) return;
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(txt);
+        u.lang = 'en-US'; u.rate = 0.85; window.speechSynthesis.speak(u);
+    }
+};
+
+const Render = {
+    sidebar() {
+        const nav = document.getElementById('nav-modules');
+        nav.innerHTML = '';
+        Object.keys(DATA).forEach(l => {
+            const data = DATA[l];
+            const grp = document.createElement('div');
+            grp.className = 'mb-8';
+            grp.innerHTML = `<h3 class="text-[11px] font-black text-${data.theme}-500 uppercase tracking-widest px-2 mb-3 border-l-4 border-${data.theme}-500 ml-2 pl-2">${l} Level</h3>`;
             
-            document.addEventListener('keydown', (e) => {
-                if (e.key === "Escape") closeModal();
+            data.mods.forEach(m => {
+                const btn = document.createElement('button');
+                const isAct = State.mod === m.id;
+                btn.className = `w-full text-left px-5 py-3.5 rounded-2xl transition-all border ${isAct ? 'bg-white border-slate-200 shadow-md' : 'border-transparent text-slate-500 hover:bg-slate-100 hover:text-slate-800'} mb-1.5`;
+                btn.innerHTML = `
+                    <div class="text-[13.5px] font-bold ${isAct ? 'text-'+data.theme+'-600' : ''}">${m.title}</div>
+                    <div class="text-[10px] font-bold mt-1.5 inline-flex items-center gap-1 ${isAct ? 'bg-'+data.theme+'-50 text-'+data.theme+'-600' : 'bg-slate-200 text-slate-500'} px-2 py-0.5 rounded-md">
+                        <span>🧩</span> ${m.subs.length} Topics
+                    </div>`;
+                btn.onclick = () => { State.update(l, m.id, 'theory'); if(window.innerWidth<768) document.getElementById('btn-menu').click(); };
+                grp.appendChild(btn);
             });
-        };
-    </script>
+            nav.appendChild(grp);
+        });
+    },
+
+    main() {
+        const main = document.getElementById('main-content');
+        const lvlData = DATA[State.lvl];
+        const mObj = lvlData.mods.find(m => m.id === State.mod);
+
+        main.innerHTML = `
+            <div class="bg-gradient-to-br ${lvlData.color} pb-10 pt-8 px-6 md:px-12 relative overflow-hidden shadow-sm">
+                <div class="absolute -right-10 -bottom-20 opacity-10 text-[15rem] font-black italic">${State.lvl}</div>
+                <div class="relative z-10 max-w-5xl mx-auto">
+                    <span class="bg-white/20 backdrop-blur-sm text-white border border-white/30 px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase mb-4 inline-block shadow-sm">${State.lvl} • Your Koala🐨 space</span>
+                    <h1 class="text-3xl md:text-5xl font-black text-white tracking-tight mb-6 drop-shadow-md">${mObj.title}</h1>
+                    <div class="flex flex-wrap gap-2">
+                        ${mObj.subs.map(s => `<span class="bg-white text-slate-800 text-[11px] font-bold px-3 py-1.5 rounded-lg shadow-sm border border-slate-100"># ${s}</span>`).join('')}
+                    </div>
+                </div>
+            </div>
+
+            <div class="max-w-5xl mx-auto px-4 md:px-8 mt-[-1.5rem] relative z-20">
+                <div class="bg-white/70 backdrop-blur-xl p-1.5 rounded-2xl flex overflow-x-auto hide-scrollbar gap-1 border border-white shadow-soft">
+                    ${['theory', 'vocab', 'phonetics', 'listening', 'practice', 'lab'].map(t => {
+                        const icons = { theory:'📘', vocab:'📚', phonetics:'🔤', listening:'🎧', practice:'✍️', lab:'🎤' };
+                        const isAct = State.tab === t;
+                        return `<button onclick="State.update('${State.lvl}', '${State.mod}', '${t}')" class="tab-pill px-5 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 whitespace-nowrap min-w-[120px] flex-1 ${isAct ? 'tab-pill-active text-'+lvlData.theme+'-600' : 'tab-pill-inactive hover:text-slate-800 hover:bg-white/50'}">
+                            <span class="text-lg">${icons[t]}</span> <span class="capitalize">${t === 'lab' ? 'Kil Lab' : t}</span>
+                        </button>`;
+                    }).join('')}
+                </div>
+                <div id="tab-content" class="mt-8 pb-24 fade-in"></div>
+            </div>`;
+        
+        this.tab(mObj, lvlData.theme);
+    },
+
+    tab(c, theme) {
+        const ct = document.getElementById('tab-content');
+        
+        if (State.tab === 'theory') {
+            ct.innerHTML = `
+                <div class="max-w-4xl mx-auto space-y-10">
+                    <div class="bg-white p-8 md:p-10 rounded-[2rem] border border-slate-100 shadow-sm text-center">
+                        <h2 class="text-3xl font-black mb-4 text-slate-800">Real-Life Context</h2>
+                        <p class="text-slate-600 font-medium text-lg leading-relaxed">${c.th.intro}</p>
+                    </div>
+                    <div class="bg-${theme}-600 text-white p-10 md:p-12 rounded-[2.5rem] text-center shadow-lg relative overflow-hidden border border-${theme}-500/50">
+                        <p class="text-sm font-bold uppercase tracking-widest mb-5 opacity-80 relative z-10">The Golden Structure</p>
+                        <div class="text-xl md:text-3xl font-mono font-black relative z-10 bg-black/20 py-5 px-8 rounded-2xl inline-block border border-white/20 shadow-inner">${c.th.f}</div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        ${c.th.blocks.map(b => `<div class="bg-white p-8 rounded-3xl border-t-4 border-t-${theme}-500 shadow-sm"><h4 class="font-black text-${theme}-600 uppercase text-sm tracking-widest mb-3">${b.t}</h4><p class="font-medium text-slate-700">${b.d}</p></div>`).join('')}
+                    </div>
+                    <h3 class="text-2xl font-black px-2 mt-12 mb-6 text-slate-800 flex items-center gap-3">
+                        <span class="bg-${theme}-100 text-${theme}-600 px-3 py-1 rounded-xl text-lg">${c.th.ex.length}</span> Examples in Action
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${c.th.ex.map((ex, idx) => `<div class="p-5 bg-white rounded-2xl border border-slate-100 shadow-sm flex gap-4 items-center group cursor-pointer hover:border-${theme}-400 hover:shadow-md transition" onclick="AudioSvc.speak('${ex[0]}')">
+                            <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center font-bold text-xs shrink-0 group-hover:bg-${theme}-100 group-hover:text-${theme}-600 transition">${idx + 1}</div>
+                            <div class="flex-1"><p class="font-bold text-${theme}-700 text-[1.1rem]">${ex[0]}</p><p class="text-sm text-slate-500 font-medium mt-1">${ex[1]}</p></div>
+                            <span class="opacity-0 group-hover:opacity-100 transition text-xl text-${theme}-500 shrink-0">🔊</span>
+                        </div>`).join('')}
+                    </div>
+                </div>`;
+        }
+        else if (State.tab === 'vocab') {
+            ct.innerHTML = `
+                <div class="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-sm mb-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div><h2 class="text-2xl font-black text-slate-800">Interactive Flashcards</h2><p class="text-sm text-slate-500 font-medium mt-1">Flip & Listen. No translation. Build direct mental links.</p></div>
+                    <span class="bg-${theme}-100 text-${theme}-700 px-5 py-2.5 rounded-xl font-black text-sm">${c.v.length} Words</span>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-5">
+                    ${c.v.map(v => `<div class="flashcard" onclick="this.classList.toggle('flipped'); AudioSvc.speak('${v[1]}')">
+                        <div class="flashcard-inner"><div class="flashcard-face flashcard-front">${v[0]}</div>
+                        <div class="flashcard-face flashcard-back bg-${theme}-500"><p class="font-black text-[1.4rem] leading-none">${v[1]}</p><p class="font-mono text-[10px] mt-2 bg-white/20 px-2 py-1 rounded font-bold">${v[2]}</p><p class="text-[0.8rem] mt-3 opacity-90 italic leading-snug">"${v[3]}"</p></div>
+                        </div></div>`).join('')}
+                </div>`;
+        }
+        else if (State.tab === 'phonetics') {
+            ct.innerHTML = `
+                <div class="text-center mb-10"><h2 class="text-3xl font-black text-slate-800">Sound Mastery</h2><p class="text-slate-500 mt-2 font-medium">Listen and repeat carefully.</p></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                    ${c.ph.map(p => `<div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-floating transition">
+                        <div class="text-4xl font-black text-${theme}-500 mb-6 py-6 bg-${theme}-50 rounded-2xl text-center">${p.s}</div>
+                        <div class="space-y-3">${p.w.map(w => `<button onclick="AudioSvc.speak('${w}')" class="w-full bg-slate-50 p-4 rounded-xl font-bold flex justify-between hover:bg-${theme}-500 hover:text-white transition text-slate-700">${w} <span>🔊</span></button>`).join('')}</div>
+                    </div>`).join('')}
+                </div>`;
+        }
+        else if (State.tab === 'listening') {
+            ct.innerHTML = `
+                <div class="max-w-2xl mx-auto space-y-10">
+                    <div class="bg-${theme}-500 p-12 rounded-[2.5rem] text-center text-white shadow-xl relative overflow-hidden border border-${theme}-400">
+                        <span class="absolute -left-4 -top-4 text-9xl opacity-10">🎧</span>
+                        <button onclick="AudioSvc.speak('${c.ls.s.replace(/'/g, "\\'")}')" class="relative z-10 bg-white text-${theme}-600 px-10 py-5 rounded-full font-black text-xl hover:scale-105 transition shadow-lg w-full sm:w-auto">▶️ Play Audio Task</button>
+                    </div>
+                    <div class="space-y-6">
+                        ${c.ls.qs.map((q, i) => `<div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm" id="lq-${i}"><p class="font-bold mb-5 text-lg text-slate-800">${i+1}. ${q.q}</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                ${q.o.map((opt, idx) => `<label class="p-4 border rounded-xl flex items-center gap-3 cursor-pointer hover:bg-slate-50 transition border-slate-200">
+                                    <input type="radio" name="lq${i}" value="${idx}" class="w-5 h-5 text-${theme}-500 focus:ring-${theme}-500"> <span class="font-medium text-slate-700">${opt}</span>
+                                </label>`).join('')}
+                            </div></div>`).join('')}
+                        <button id="btn-chk-listen" class="w-full bg-slate-800 text-white py-5 rounded-2xl font-black text-xl hover:bg-black transition shadow-soft">Check Answers</button>
+                        <div id="listen-fb" class="text-center font-black text-xl hidden py-4"></div>
+                    </div>
+                    <div class="text-center mt-8 border-t border-slate-200 pt-8"><button onclick="this.nextElementSibling.classList.toggle('hidden')" class="text-${theme}-600 font-bold text-lg hover:underline">Toggle Script</button>
+                    <div class="hidden mt-6 p-8 bg-white rounded-3xl border border-slate-100 shadow-inner text-slate-600 text-lg leading-relaxed italic">"${c.ls.s}"</div></div>
+                </div>`;
+            document.getElementById('btn-chk-listen').onclick = () => this.chkListen(c.ls.qs);
+        }
+        else if (State.tab === 'practice') {
+            ct.innerHTML = `
+                <div class="max-w-3xl mx-auto space-y-8">
+                    ${c.pr.map((p, i) => {
+                        let html = `<p class="text-[1.2rem] font-bold text-center mb-6 text-slate-800">${p.q.replace('___', '<span class="inline-block w-20 border-b-2 border-slate-800 mx-2"></span>')}</p>`;
+                        if (p.t === 'fill' || p.t === 'error') {
+                            html += `<div class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"><input type="text" id="pi-${i}" class="flex-1 border-2 border-slate-200 bg-slate-50 p-4 rounded-xl text-center font-bold outline-none focus:border-${theme}-500 text-lg text-slate-700"><button class="bg-slate-800 text-white px-8 py-4 rounded-xl font-bold hover:bg-black text-lg transition" onclick="Render.chkPracI(${i}, '${p.t==='fill'?p.a:p.c}', '${theme}')">Check</button></div>`;
+                        } else {
+                            html += `<div class="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">${p.o.map((opt, idx) => `<button onclick="Render.chkPracM(${i}, ${idx}, ${p.a}, this, '${theme}')" class="flex-1 py-4 bg-slate-50 border-2 border-slate-200 rounded-xl font-bold hover:border-${theme}-400 hover:text-${theme}-600 transition text-lg text-slate-600">${opt}</button>`).join('')}</div>`;
+                        }
+                        return `<div class="bg-white p-8 md:p-10 rounded-3xl border border-slate-100 shadow-sm" id="pc-${i}">${html}<div id="pfb-${i}" class="text-center font-bold mt-6 hidden text-[15px]"></div></div>`;
+                    }).join('')}
+                </div>`;
+        }
+        else if (State.tab === 'lab') {
+            ct.innerHTML = `
+                <div class="max-w-2xl mx-auto mt-4">
+                    <div class="bg-slate-900 text-white rounded-[2.5rem] p-12 text-center shadow-2xl relative overflow-hidden border border-slate-800">
+                        <span class="absolute -right-10 -bottom-10 text-[10rem] opacity-5">🎤</span>
+                        <span class="bg-${theme}-500/20 text-${theme}-300 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest mb-6 inline-block border border-${theme}-500/30">Speaking Task</span>
+                        <h2 class="text-3xl md:text-4xl font-black mb-6 relative z-10 leading-tight">${c.lab.t}</h2>
+                        <div class="bg-white/5 p-8 rounded-2xl text-left mb-10 border border-white/10 text-slate-300 text-lg relative z-10 leading-relaxed font-medium">"${c.lab.d}"</div>
+                        <a href="https://wa.me/573229429358?text=Kil,%20I%20am%20ready%20for%20the%20task:%20${encodeURIComponent(c.lab.t)}" target="_blank" class="bg-${theme}-500 text-white px-10 py-5 rounded-full font-black text-xl hover:scale-105 transition shadow-[0_0_25px_rgba(0,0,0,0.2)] relative z-10 w-full sm:w-auto inline-flex items-center justify-center gap-4">
+                            <span class="text-3xl">📱</span> Send Audio to Kil
+                        </a>
+                    </div>
+                </div>`;
+        }
+    },
+
+    chkListen(qs) {
+        let sc = 0;
+        qs.forEach((q, i) => {
+            const s = document.querySelector(`input[name="lq${i}"]:checked`);
+            const c = document.getElementById(`lq-${i}`);
+            c.classList.remove('bg-green-50', 'bg-red-50', 'border-green-300', 'border-red-300');
+            if (s && parseInt(s.value) === q.a) { c.classList.add('bg-green-50', 'border-green-300'); sc++; }
+            else { c.classList.add('bg-red-50', 'border-red-300'); }
+        });
+        const fb = document.getElementById('listen-fb');
+        fb.classList.remove('hidden', 'text-green-600', 'text-red-500');
+        if(sc === qs.length) { fb.innerHTML = "Excellent! 🎉 All correct!"; fb.classList.add('text-green-600', 'fade-in'); }
+        else { fb.innerHTML = `Try again. Focus on key details. (${sc}/${qs.length})`; fb.classList.add('text-red-500', 'fade-in'); }
+    },
+
+    chkPracI(i, ans, theme) {
+        const inp = document.getElementById(`pi-${i}`), fb = document.getElementById(`pfb-${i}`), c = document.getElementById(`pc-${i}`);
+        c.classList.remove('bounce', 'shake'); void c.offsetWidth;
+        if(inp.value.trim().toLowerCase() === ans.toLowerCase()) {
+            inp.className = `flex-1 border-2 border-green-500 bg-green-50 p-4 rounded-xl text-center font-bold text-green-700 text-lg`;
+            fb.innerHTML = "Excellent! 🎉"; fb.className = "text-center font-bold mt-6 text-green-600 block fade-in text-[16px]"; c.classList.add('bounce');
+        } else {
+            inp.className = `flex-1 border-2 border-red-400 bg-red-50 p-4 rounded-xl text-center font-bold text-red-600 text-lg`;
+            fb.innerHTML = `Try again. (Hint: <strong>${ans}</strong>)`; fb.className = "text-center font-bold mt-6 text-red-500 block fade-in text-[16px]"; c.classList.add('shake');
+        }
+    },
+
+    chkPracM(i, sIdx, cIdx, btn, theme) {
+        const c = document.getElementById(`pc-${i}`), fb = document.getElementById(`pfb-${i}`);
+        c.querySelectorAll('button').forEach(b => b.disabled = true);
+        c.classList.remove('bounce', 'shake'); void c.offsetWidth;
+        if(sIdx === cIdx) {
+            btn.className = "flex-1 py-4 bg-green-50 border-2 border-green-500 rounded-xl font-bold text-green-700 transition text-lg w-full";
+            fb.innerHTML = "Excellent! 🎉"; fb.className = "text-center font-bold mt-6 text-green-600 block fade-in text-[16px]"; c.classList.add('bounce');
+        } else {
+            btn.className = "flex-1 py-4 bg-red-50 border-2 border-red-400 rounded-xl font-bold text-red-600 transition text-lg w-full";
+            c.querySelectorAll('button')[cIdx].className = "flex-1 py-4 bg-green-50 border-2 border-green-500 rounded-xl font-bold text-green-700 transition text-lg w-full";
+            fb.innerHTML = "Try again. Focus on key details."; fb.className = "text-center font-bold mt-6 text-red-500 block fade-in text-[16px]"; c.classList.add('shake');
+        }
+    },
+
+    all() { this.sidebar(); this.main(); }
+};
+
+// UI Handlers
+document.getElementById('btn-menu').onclick = () => { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('mobile-overlay').classList.toggle('hidden'); };
+document.getElementById('mobile-overlay').onclick = document.getElementById('btn-menu').onclick;
+
+const aiMdl = document.getElementById('ai-modal');
+document.getElementById('btn-ai').onclick = () => aiMdl.classList.remove('hidden');
+document.querySelectorAll('.ai-close').forEach(b => b.onclick = () => aiMdl.classList.add('hidden'));
+document.getElementById('btn-ai-send').onclick = () => {
+    const i = document.getElementById('ai-input'), c = document.getElementById('ai-chat');
+    if(!i.value.trim()) return;
+    c.innerHTML += `<div class="bg-slate-800 text-white p-3 rounded-2xl rounded-tr-none self-end max-w-[85%] text-sm fade-in shadow-sm">${i.value}</div>`; i.value = ''; c.scrollTop = c.scrollHeight;
+    setTimeout(() => { c.innerHTML += `<div class="bg-white p-3 rounded-2xl rounded-tl-none self-start max-w-[85%] text-sm border border-slate-200 shadow-sm font-medium text-slate-800 fade-in"><strong>Kil:</strong> Great question! Keep practicing in your Koala space. 🐨</div>`; c.scrollTop = c.scrollHeight; }, 600);
+};
+
+window.onload = () => State.init();
+</script>
 </body>
 </html>
